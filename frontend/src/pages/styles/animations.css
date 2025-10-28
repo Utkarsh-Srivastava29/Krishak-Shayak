@@ -1,0 +1,59 @@
+/* Animation definitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Animation classes */
+.fade-in-animation {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.success-animation {
+  animation: bounce 1.5s ease-in-out;
+}
+
+/* Tailwind doesn't have these by default */
+.blur-2xl {
+  filter: blur(40px);
+}
+
+.blur-3xl {
+  filter: blur(64px);
+}
+
+.opacity-10 {
+  opacity: 0.1;
+}
+
+.opacity-15 {
+  opacity: 0.15;
+}
+
+.opacity-20 {
+  opacity: 0.2;
+}
+
+/* Fix z-index for decorative elements */
+.-z-5 {
+  z-index: -5;
+}
+
+.-z-10 {
+  z-index: -10;
+}

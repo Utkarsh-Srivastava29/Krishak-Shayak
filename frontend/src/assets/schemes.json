@@ -1,0 +1,813 @@
+[
+  {
+    "id": 1,
+    "name": "PM-KISAN e-KYC Mandate",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2025",
+    "description": "eKYC made mandatory for all PM-KISAN registered farmers. OTP-based and Biometric eKYC available through portal and CSC centers to ensure authenticity and prevent fraudulent claims.",
+    "eligibility": "All existing PM-KISAN beneficiaries",
+    "benefits": "Continued benefit eligibility, prevention of duplicate/fraudulent claims, streamlined verification",
+    "official_link": "https://pmkisan.gov.in/",
+    "data_sources": []
+  },
+  {
+    "id": 2,
+    "name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2018-12-01",
+    "description": "Income support of ₹6,000 per year to eligible landholding farmer families, paid in 3 equal instalments. Over 10 crore farmers benefited as of 2025.",
+    "eligibility": "Small and marginal landholding farmer families (subject to exclusion criteria)",
+    "benefits": "Direct cash transfer of ₹6,000/year in three installments",
+    "official_link": "https://pmkisan.gov.in/",
+    "data_sources": []
+  },
+  {
+    "id": 2,
+    "name": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2016",
+    "description": "Crop insurance scheme to provide insurance coverage and financial support to farmers in the event of crop failure.",
+    "eligibility": "All farmers growing notified crops in notified areas",
+    "benefits": "Compensation for crop loss/damage",
+    "official_link": "https://pmfby.gov.in/",
+    "data_sources": [
+      "turn0search5",
+      "turn0search6"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Kisan Credit Card (KCC) Scheme",
+    "department": "Ministry of Agriculture & Farmers Welfare / NABARD",
+    "launch_date": "1998",
+    "description": "Provides short-term credit to farmers for cultivation and allied activities.",
+    "eligibility": "Farmers, tenant farmers, oral lessees",
+    "benefits": "Easy credit, overdraft facility, crop loans",
+    "official_link": "https://rbi.org.in/ (info pages)",
+    "data_sources": [
+      "turn0search2",
+      "turn0search8"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Pradhan Mantri Kisan MaanDhan Yojana (PM-KMY)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2019-09-12",
+    "description": "Pension scheme for small and marginal farmers; contributory with matching government share.",
+    "eligibility": "Small and marginal farmers aged 18-40 years",
+    "benefits": "Monthly pension of ₹3,000 after 60 years",
+    "official_link": "https://agriwelfare.gov.in/",
+    "data_sources": [
+      "turn0search6",
+      "turn0search8"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Pradhan Mantri Krishi Sinchai Yojana (PMKSY)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2015",
+    "description": "'Per Drop More Crop' — aims to improve irrigation, water use efficiency and expand cultivated area under assured irrigation.",
+    "eligibility": "Farmers and states implementing irrigation projects",
+    "benefits": "Micro-irrigation subsidies, improved irrigation infrastructure",
+    "official_link": "https://pmksy.gov.in/",
+    "data_sources": [
+      "turn0search1"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Soil Health Card Scheme",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2015",
+    "description": "Provides soil health cards to farmers advising on nutrient management and fertilizers.",
+    "eligibility": "All farmers",
+    "benefits": "Soil test-based nutrient recommendations",
+    "official_link": "https://soilhealth.dac.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Paramparagat Krishi Vikas Yojana (PKVY)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2015",
+    "description": "Promotes organic farming through clusters and training.",
+    "eligibility": "Farmer groups forming organic clusters",
+    "benefits": "Support for organic inputs, premium price potential",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "turn0search14"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "National Agriculture Market (e-NAM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2016",
+    "description": "An electronic trading portal for agricultural commodities to create a unified national market.",
+    "eligibility": "Licensed traders, farmers, mandis",
+    "benefits": "Transparent price discovery, wider market access",
+    "official_link": "https://www.enam.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Agriculture Infrastructure Fund (AIF)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2020",
+    "description": "Credit facility for investment in post-harvest infrastructure and community farming assets.",
+    "eligibility": "Farmer groups, startups, agrientrepreneurs",
+    "benefits": "Concessional credit and interest subvention",
+    "official_link": "https://agriinfra.dac.gov.in/",
+    "data_sources": [
+      "turn0search1",
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "National Food Security Mission (NFSM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2007-08",
+    "description": "Increase production of rice, wheat, pulses, and coarse cereals through area expansion and productivity enhancement.",
+    "eligibility": "State governments and farmers under mission projects",
+    "benefits": "Assistance for seeds, fertilizers, crop management practices",
+    "official_link": "https://nfsm.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Sub-Mission on Agricultural Mechanization (SMAM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "Promotes agricultural mechanization among small and marginal farmers.",
+    "eligibility": "Farmers, cooperatives, FPOs",
+    "benefits": "Subsidies for machines and custom hiring centers",
+    "official_link": "https://agriwelfare.gov.in/",
+    "data_sources": [
+      "turn0search16"
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Soil Health Management (SHM) under NMSA",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2010",
+    "description": "Part of NMSA to improve soil health via liming, gypsum, micro-nutrients and organic matter.",
+    "eligibility": "Farmers under NMSA activities",
+    "benefits": "Technical assistance, inputs for soil improvement",
+    "official_link": "https://nmsa.dac.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan (PM-KUSUM)",
+    "department": "Ministry of New & Renewable Energy / Agriculture",
+    "launch_date": "2019",
+    "description": "Promotes solar power in agriculture through solarization of pumps and decentralised power plants.",
+    "eligibility": "Farmers, aggregators, project developers",
+    "benefits": "Subsidies for solar pumps, income from power sale",
+    "official_link": "https://mnre.gov.in/pm-kusum",
+    "data_sources": [
+      "turn0search1"
+    ]
+  },
+  {
+    "id": 14,
+    "name": "National Horticulture Mission (NHM) / Mission for Integrated Development of Horticulture (MIDH)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "Promotes holistic growth of horticulture sector including production, post-harvest, and marketing.",
+    "eligibility": "Horticulture farmers, FPOs, SHGs",
+    "benefits": "Assistance for planting material, post-harvest infrastructure",
+    "official_link": "https://midh.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 15,
+    "name": "Pradhan Mantri Formalisation of Micro Food Processing Enterprises (PM-FME)",
+    "department": "Ministry of Food Processing Industries",
+    "launch_date": "2020",
+    "description": "Supports micro food processing enterprises with credit, grants and training.",
+    "eligibility": "Micro food processing units, FPOs, SHGs",
+    "benefits": "Financial assistance, capacity building, branding support",
+    "official_link": "https://pmfme.mofpi.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 16,
+    "name": "National Beekeeping and Honey Mission (NBHM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2020",
+    "description": "Promotes beekeeping and allied activities to enhance farmer incomes and pollination services.",
+    "eligibility": "Farmers, SHGs, FPOs",
+    "benefits": "Support for beehives, training, marketing",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "turn0search14"
+    ]
+  },
+  {
+    "id": 17,
+    "name": "Pradhan Mantri Matsya Sampada Yojana (PMMSY)",
+    "department": "Ministry of Fisheries, Animal Husbandry & Dairying",
+    "launch_date": "2020",
+    "description": "Aims to bring about Blue Revolution through sustainable and responsible development of fisheries.",
+    "eligibility": "Fishers, fish farmers, entrepreneurs",
+    "benefits": "Financial assistance for aquaculture infrastructure and technology",
+    "official_link": "https://pmmsy.dof.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 18,
+    "name": "National Fisheries Development Board (NFDB) schemes",
+    "department": "Ministry of Fisheries",
+    "launch_date": "2018",
+    "description": "Various schemes for fisheries development, including seed production, aquaculture and extension.",
+    "eligibility": "Fisherfolk, farmers, entrepreneurs",
+    "benefits": "Subsidies, technical assistance, infrastructure support",
+    "official_link": "https://nfdb.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 19,
+    "name": "National Cooperative Development Corporation (NCDC) schemes for agriculture",
+    "department": "NCDC / Ministry of Cooperation",
+    "launch_date": "1963",
+    "description": "Financing and development support for cooperatives in agriculture and allied sectors.",
+    "eligibility": "Cooperatives, farmer groups",
+    "benefits": "Loans, grants for infrastructure and value addition",
+    "official_link": "https://ncdc.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Pradhan Mantri Poshan (Nutrition) related schemes (support for agrifood)",
+    "department": "Ministry of Women & Child Development / Agriculture linkages",
+    "launch_date": "2018",
+    "description": "Schemes focusing on nutrition security that link farmers to nutrition programs (e.g., procurement of millets, pulses).",
+    "eligibility": "Producers supplying to public programs",
+    "benefits": "Market linkages, procurement support",
+    "official_link": "https://pmposhan.education.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 21,
+    "name": "National Mission on Sustainable Agriculture (NMSA)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "Aims for sustainable agriculture through efficient water use, soil management, and climate resilience.",
+    "eligibility": "States and farmers under program",
+    "benefits": "Support for climate resilient practices, resource conservation",
+    "official_link": "https://nmsa.dac.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Sub-Mission on Agroforestry (SMAF)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2016",
+    "description": "Promotes agroforestry practices for additional income and ecological benefits.",
+    "eligibility": "Farmers adopting agroforestry",
+    "benefits": "Technical assistance, planting material support",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 23,
+    "name": "National Food Processing Policy / PM Kisan Sampada Yojana",
+    "department": "Ministry of Food Processing Industries",
+    "launch_date": "2017",
+    "description": "Supports creation of modern food processing infrastructure and value addition.",
+    "eligibility": "Processors, entrepreneurs, FPOs",
+    "benefits": "Grants, cold-chains, branding support",
+    "official_link": "https://sampada.mofpi.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Interest Subvention Scheme for Crop Loans / Modified Interest Subvention",
+    "department": "Ministry of Agriculture & Farmers Welfare / RBI",
+    "launch_date": "2007",
+    "description": "Interest subvention to farmers on short-term crop loans to reduce cost of credit.",
+    "eligibility": "Farmers availing short-term crop loans",
+    "benefits": "Lower effective interest rate (subsidy)",
+    "official_link": "https://rbi.org.in/",
+    "data_sources": [
+      "turn0search14"
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Farmer Producer Organisations (FPO) Promotion (APEX, SFAC support)",
+    "department": "Small Farmers Agribusiness Consortium (SFAC) / Ministry of Agriculture",
+    "launch_date": "2020",
+    "description": "Supports formation and strengthening of FPOs for better market access and economies of scale.",
+    "eligibility": "Farmer groups forming FPOs",
+    "benefits": "Grants for business plans, equity support, capacity building",
+    "official_link": "https://sfacindia.org.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 26,
+    "name": "Rashtriya Krishi Vikas Yojana (RKVY)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2007",
+    "description": "Provides flexibility and funds to states to formulate agricultural development plans.",
+    "eligibility": "State departments and farmers under projects",
+    "benefits": "Project funding for state-specific agriculture interventions",
+    "official_link": "https://rkvy.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 27,
+    "name": "National Cooperative Development Programme for Farmers",
+    "department": "Ministry of Cooperation",
+    "launch_date": "1980",
+    "description": "Support to cooperative societies for agriculture marketing, processing and infrastructure.",
+    "eligibility": "Cooperatives",
+    "benefits": "Grants, loans for cooperative projects",
+    "official_link": "https://cooperation.gov.in/",
+    "data_sources": [
+      "turn0search2",
+      "turn0search19"
+    ]
+  },
+  {
+    "id": 28,
+    "name": "On-Farm Water Management (OFWM) - Rashtriya Krishi Vikas Yojana components",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "Supports efficient on-farm water use, micro-irrigation, and water conservation.",
+    "eligibility": "Farmers and state implementing agencies",
+    "benefits": "Subsidies for drip and sprinkler systems",
+    "official_link": "https://pmksy.gov.in/",
+    "data_sources": [
+      "turn0search1",
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Soil and Land Use Survey (S&LUS) and Land Records Modernization links",
+    "department": "Ministry of Agriculture/Land Records modernization",
+    "launch_date": "1960",
+    "description": "Initiatives for better land records and soil mapping to support schemes and eligibility verification.",
+    "eligibility": "State agencies and farmers",
+    "benefits": "Accurate land records for DBT and scheme targeting",
+    "official_link": "https://jamabandi.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Integrated Scheme for Agricultural Marketing (ISAM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "Supports market infrastructure including rural markets, capacity building and promotion of value chains.",
+    "eligibility": "State agencies, market committees, entrepreneurs",
+    "benefits": "Funds for market yards, grading, storage and market linkages",
+    "official_link": "https://agmarknet.gov.in/",
+    "data_sources": [
+      "turn0search1",
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 31,
+    "name": "National Bee-keeping and Honey Mission (repeat as NBHM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2020",
+    "description": "(Listed earlier) enhances income through apiculture and pollination services.",
+    "eligibility": "Farmers, groups",
+    "benefits": "Beekeeping kits, training",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "turn0search14"
+    ]
+  },
+  {
+    "id": 32,
+    "name": "Sub-Mission on Seed and Planting Material (Seed Village Programme)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2018",
+    "description": "Ensures availability of quality seeds and planting materials to farmers.",
+    "eligibility": "Seed producers, farmers",
+    "benefits": "Assistance for certified seeds, seed production",
+    "official_link": "https://seednet.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 33,
+    "name": "National Mission on Edible Oils – Oil Palm (NMEO-OP)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "Promotes cultivation of oil palm to increase domestic edible oil production.",
+    "eligibility": "Farmers adopting oil palm cultivation",
+    "benefits": "Support for seedlings, inputs, and extension",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "turn0search14"
+    ]
+  },
+  {
+    "id": 34,
+    "name": "Pradhan Mantri Matsya Sampada Yojana (PMMSY) (repeat)",
+    "department": "Ministry of Fisheries",
+    "launch_date": "2020",
+    "description": "(Listed earlier) Blue Revolution-focused fisheries development",
+    "eligibility": "Fish farmers",
+    "benefits": "Infrastructure & credit support",
+    "official_link": "https://pmmsy.dof.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 35,
+    "name": "Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA) (links to agriculture labour)",
+    "department": "Ministry of Rural Development",
+    "launch_date": "2005",
+    "description": "Provides rural employment and can support agricultural and water conservation works.",
+    "eligibility": "Rural households",
+    "benefits": "Wage employment, rural asset creation",
+    "official_link": "https://nrega.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 36,
+    "name": "National Dairy Plan (NDP)",
+    "department": "NDDB / Ministry of Fisheries, Animal Husbandry & Dairying",
+    "launch_date": "2011",
+    "description": "Aims to enhance productivity of milch animals and milk production infrastructure.",
+    "eligibility": "Dairy farmers, cooperatives",
+    "benefits": "Breed improvement, extension, infrastructure",
+    "official_link": "https://nddb.coop/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 37,
+    "name": "National Mission for Sustainable Agriculture (repeat NMSA)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "(Listed earlier) climate resilience and sustainable practices",
+    "eligibility": "States and farmers under projects",
+    "benefits": "Support for integrated farming systems",
+    "official_link": "https://nmsa.dac.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 38,
+    "name": "Soil Health Management (repeat)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2010",
+    "description": "(Listed earlier) soil testing, micro-nutrient management",
+    "eligibility": "All farmers",
+    "benefits": "Soil test reports and recommendations",
+    "official_link": "https://soilhealth.dac.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 39,
+    "name": "National Seed Plan",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2005",
+    "description": "Schemes to boost seed production and availability.",
+    "eligibility": "Seed producers, state seed corporations",
+    "benefits": "Subsidy and support for seed production",
+    "official_link": "https://seednet.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 40,
+    "name": "Per Drop More Crop (Component of PMKSY)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2015",
+    "description": "Focuses on micro-irrigation to improve water use efficiency.",
+    "eligibility": "Farmers adopting micro-irrigation",
+    "benefits": "Subsidies for drip/sprinkler systems",
+    "official_link": "https://pmksy.gov.in/",
+    "data_sources": [
+      "turn0search1"
+    ]
+  },
+  {
+    "id": 41,
+    "name": "National Mission on Agricultural Extension and Technology (NMAET) / ATMA",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2005",
+    "description": "Strengthens agricultural extension systems via ATMA model at district level.",
+    "eligibility": "State/district extension systems",
+    "benefits": "Capacity building, extension services to farmers",
+    "official_link": "https://atma.dac.gov.in/",
+    "data_sources": [
+      "turn0search1",
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 42,
+    "name": "Pradhan Mantri Formalisation of Micro Food Processing Enterprises (PM-FME) (repeat)",
+    "department": "Ministry of Food Processing Industries",
+    "launch_date": "2020",
+    "description": "(Listed earlier) supports micro food processing units",
+    "eligibility": "Micro enterprises",
+    "benefits": "Grants and credit support",
+    "official_link": "https://pmfme.mofpi.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 43,
+    "name": "National Bamboo Mission",
+    "department": "Ministry of Agriculture & Farmers Welfare / Ministry of Commerce (various)",
+    "launch_date": "2018",
+    "description": "Promotes bamboo cultivation and value chain development.",
+    "eligibility": "Farmers, entrepreneurs",
+    "benefits": "Assistance in plantation, post-harvest processing",
+    "official_link": "https://nbm.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 44,
+    "name": "Support to State Extension Programmes for Extension Reforms (ATMA component)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2005",
+    "description": "Strengthens state extension systems and decentralized extension planning.",
+    "eligibility": "State extension agencies",
+    "benefits": "Funds for extension reforms and activities",
+    "official_link": "https://atma.dac.gov.in/",
+    "data_sources": [
+      "turn0search1"
+    ]
+  },
+  {
+    "id": 45,
+    "name": "National Mission on Agroforestry (repeat SMAF)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2016",
+    "description": "(Listed earlier) promotes agroforestry & allied activities",
+    "eligibility": "Farmers planting trees on farmland",
+    "benefits": "Support for planting material and technical assistance",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 46,
+    "name": "Rashtriya Gokul Mission (for bovine development)",
+    "department": "Department of Animal Husbandry & Dairying",
+    "launch_date": "2014",
+    "description": "Conservation and development of indigenous bovine breeds.",
+    "eligibility": "Dairy farmers, breeders",
+    "benefits": "Breed improvement programmes, infrastructure",
+    "official_link": "https://dahd.nic.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 47,
+    "name": "NABARD Farmer Producer Organization (FPO) Support Programmes",
+    "department": "NABARD / Ministry of Agriculture",
+    "launch_date": "2014",
+    "description": "Financial and capacity support for FPO formation and strengthening.",
+    "eligibility": "FPOs and farmer groups",
+    "benefits": "Credit, grants, technical assistance",
+    "official_link": "https://nabard.org/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 48,
+    "name": "Mission for Integrated Development of Horticulture (repeat MIDH)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2014",
+    "description": "(Listed earlier) supports horticulture production and post-harvest management",
+    "eligibility": "Horticulture farmers, entrepreneurs",
+    "benefits": "Assistance for production, processing and marketing",
+    "official_link": "https://midh.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 49,
+    "name": "National Agricultural Insurance Scheme (various state & central schemes)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2000",
+    "description": "Crop and allied sector insurance schemes including PMFBY and state variants.",
+    "eligibility": "Farmers",
+    "benefits": "Insurance payouts for crop losses",
+    "official_link": "https://pmfby.gov.in/",
+    "data_sources": [
+      "turn0search5"
+    ]
+  },
+  {
+    "id": 50,
+    "name": "Digital Agriculture Mission / e-Platforms (e.g., Agmarknet, eNAM)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2016",
+    "description": "Digital platforms for market intelligence, price discovery and extension services.",
+    "eligibility": "Farmers, traders",
+    "benefits": "Market access, price transparency",
+    "official_link": "https://agmarknet.gov.in/",
+    "data_sources": [
+      "turn0search1",
+      "turn0search4"
+    ]
+  },
+  {
+    "id": 51,
+    "name": "Pradhan Mantri Kisan Sampada Yojana (value chain schemes)",
+    "department": "Ministry of Food Processing Industries",
+    "launch_date": "2016",
+    "description": "Build integrated cold chains and processing facilities to reduce wastage and add value.",
+    "eligibility": "Agro processors, entrepreneurs, FPOs",
+    "benefits": "Grant-in-aid for processing and marketing infrastructure",
+    "official_link": "https://sampada.mofpi.gov.in/",
+    "data_sources": [
+      "turn0search2"
+    ]
+  },
+  {
+    "id": 52,
+    "name": "Cluster Development Programme for Horticulture & Crops (state & central schemes)",
+    "department": "Ministry of Agriculture & State Departments",
+    "launch_date": "2020",
+    "description": "Cluster-based development for crops/horticulture including infrastructure, training and market linkages.",
+    "eligibility": "Farmer clusters, SHGs, FPOs",
+    "benefits": "Infrastructure, training, market linkages",
+    "official_link": "https://horticulture.nic.in/",
+    "data_sources": [
+      "turn0news33"
+    ]
+  },
+  {
+    "id": 53,
+    "name": "Agriculture Infrastructure Fund (AIF)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2021",
+    "description": "Medium-to-long-term debt financing for post-harvest and community farming assets.",
+    "eligibility": "Farmers, FPOs",
+    "benefits": "Loans with interest subvention & credit guarantee",
+    "official_link": "https://agriinfra.dac.gov.in/",
+    "data_sources": [
+      "source1"
+    ]
+  },
+  {
+    "id": 54,
+    "name": "National Mission on Edible Oils – Oil Palm (NMEO-OP)",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2021",
+    "description": "Promote oil-palm cultivation in NE states and Andaman & Nicobar.",
+    "eligibility": "Farmers in notified regions",
+    "benefits": "Support for seedlings, inputs",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "source2"
+    ]
+  },
+  {
+    "id": 55,
+    "name": "Digital Agriculture Mission",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2024",
+    "description": "Agri digital infrastructure (AgriStack, DSS, crop survey).",
+    "eligibility": "Nationwide",
+    "benefits": "Digital IDs, decision-support, better resource use",
+    "official_link": "https://agriwelfare.gov.in/en/DigiAgriDiv",
+    "data_sources": [
+      "source3"
+    ]
+  },
+  {
+    "id": 56,
+    "name": "Mission for Natural Farming",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2021",
+    "description": "Scale up natural/organic farming.",
+    "eligibility": "Farmers adopting natural farming",
+    "benefits": "Training, inputs, market linkages",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "source4"
+    ]
+  },
+  {
+    "id": 57,
+    "name": "Pradhan Mantri Dhan-Dhaanya Krishi Yojana",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2025",
+    "description": "Enhance productivity, irrigation, value-chain in 100 districts.",
+    "eligibility": "Farmers in selected districts",
+    "benefits": "Infrastructure, credit support",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "source5"
+    ]
+  },
+  {
+    "id": 58,
+    "name": "Dalhan Atmanirbharta Mission",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2025",
+    "description": "Self-reliant pulses mission across 100 districts.",
+    "eligibility": "Farmers, value-chain actors",
+    "benefits": "Productivity improvement, storage, supply chain",
+    "official_link": "https://agricoop.nic.in/",
+    "data_sources": [
+      "source6"
+    ]
+  },
+  {
+    "id": 59,
+    "name": "New Agricultural Marketing Infrastructure (AMI) sub-scheme of ISAM",
+    "department": "Ministry of Agriculture & Farmers Welfare",
+    "launch_date": "2020",
+    "description": "Develop agri marketing infrastructure under ISAM.",
+    "eligibility": "State agencies, market committees",
+    "benefits": "Subsidy for cold storages, grading units",
+    "official_link": "https://nabard.org/content1.aspx?catid=23&id=702",
+    "data_sources": [
+      "source7"
+    ]
+  },
+  {
+    "id": 60,
+    "name": "Rajiv Gandhi Kisan Nyay Yojana",
+    "department": "State Govt Chhattisgarh",
+    "launch_date": "2020",
+    "description": "Direct cash benefits to farmers of paddy/maize/sugarcane, pulses & oilseeds.",
+    "eligibility": "Farmers in Chhattisgarh",
+    "benefits": "Direct cash transfers",
+    "official_link": "https://rgkny.cg.nic.in/",
+    "data_sources": [
+      "source9"
+    ]
+  },
+  {
+    "id": 61,
+    "name": "SVAMITVA Yojana",
+    "department": "Ministry of Panchayati Raj",
+    "launch_date": "2021",
+    "description": "Map rural property and issue property-cards to farmers.",
+    "eligibility": "Rural property owners",
+    "benefits": "Accurate land-records, credit access",
+    "official_link": "https://svamitva.nic.in/",
+    "data_sources": [
+      "source10"
+    ]
+  }
+]
