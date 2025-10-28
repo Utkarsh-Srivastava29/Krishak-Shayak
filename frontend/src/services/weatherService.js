@@ -11,7 +11,7 @@ export const getWeatherData = async (location) => {
   try {
     // Get coordinates from location name
     const geoResponse = await axios.get(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
         location
       )}&limit=1&appid=${API_KEY}`
     );
@@ -67,7 +67,7 @@ export const getHourlyForecast = async (location) => {
   try {
     // Get coordinates from location name
     const geoResponse = await axios.get(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
         location
       )}&limit=1&appid=${API_KEY}`
     );
@@ -123,7 +123,7 @@ export const getExtendedForecast = async (location) => {
   try {
     // Get coordinates from location name
     const geoResponse = await axios.get(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
         location
       )}&limit=1&appid=${API_KEY}`
     );
@@ -431,7 +431,7 @@ export const getSuggestedCities = async (input) => {
 
   try {
     const response = await axios.get(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
         input
       )}&limit=5&appid=${API_KEY}`
     );
