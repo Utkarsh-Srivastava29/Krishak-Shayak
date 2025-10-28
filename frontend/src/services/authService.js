@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_URL as API } from './api';
 
 // Define the API base URL - adjust this to match your backend
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = `${API}/auth`;
 
 const authService = {
   register: async (userData) => {

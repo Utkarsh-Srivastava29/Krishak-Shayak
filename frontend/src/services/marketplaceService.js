@@ -1,6 +1,5 @@
 // API Configuration
-const API_URL = "http://localhost:5000/api";
-
+import { API_URL } from "./api";
 // Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
