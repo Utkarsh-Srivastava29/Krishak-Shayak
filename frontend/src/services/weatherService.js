@@ -1,8 +1,11 @@
 import axios from "axios";
 
 // Replace with your actual API key from OpenWeatherMap
-const API_KEY = "97a99a6978e3f046029de9c4a8a54795";
-const BASE_URL = "https://api.openweathermap.org/data/2.5";
+const API_KEY =
+  import.meta.env.VITE_WEATHER_API_KEY || "97a99a6978e3f046029de9c4a8a54795";
+const BASE_URL = `${
+  import.meta.env.VITE_WEATHER_BASE_URL || "https://api.openweathermap.org"
+}/data/2.5`;
 
 // Function to fetch current weather and forecast data
 export const getWeatherData = async (location) => {
