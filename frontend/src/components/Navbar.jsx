@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getCartItems } from "../services/marketplaceService";
-import { authService } from "../services/api"; // Import authService
+import { authService } from "../services/api";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +12,12 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const next = i18n.language === 'en' ? 'hi' : 'en';
+    i18n.changeLanguage(next);
+  };
 
   // Load cart count (can be called from event listener too)
   const loadCartCount = async () => {
@@ -71,109 +78,58 @@ const Navbar = () => {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 text-yellow-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
+            <img
+              src="/favicon/favicon.png"
+              alt="Krishak Shayak Logo"
+              className="h-8 w-8 rounded-full object-cover"
+            />
             <span className="text-white font-bold text-xl">Krishak Shayak</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/"
-              className="text-white hover:text-yellow-300 transition"
-            >
-              Home
-            </Link>
-            <Link
-              to="/marketplace"
-              className="text-white hover:text-yellow-300 transition"
-            >
-              Market Place
-            </Link>
-            <Link
-              to="/market-price"
-              className="text-white hover:text-yellow-300 transition"
-            >
-              Market Price
-            </Link>
-            <Link
-              to="/weather"
-              className="text-white hover:text-yellow-300 transition"
-            >
-              Weather
-            </Link>
-            <Link
-              to="/govt-schemes"
-              className="text-white hover:text-yellow-300 transition"
-            >
-              Govt Schemes
-            </Link>
-
-            {/* Show dashboard links based on user type */}
+            <Link to="/" className="text-white hover:text-yellow-300 transition">{t('navbar.home')}</Link>
+            <Link to="/marketplace" className="text-white hover:text-yellow-300 transition">{t('navbar.marketplace')}</Link>
+            <Link to="/market-price" className="text-white hover:text-yellow-300 transition">{t('navbar.marketPrice')}</Link>
+            <Link to="/weather" className="text-white hover:text-yellow-300 transition">{t('navbar.weather')}</Link>
+            <Link to="/govt-schemes" className="text-white hover:text-yellow-300 transition">{t('navbar.govtSchemes')}</Link>
             {isAuthenticated && user?.userType === "seller" && (
-              <Link
-                to="/seller-dashboard"
-                className="text-white hover:text-yellow-300 transition"
-              >
-                Dashboard
-              </Link>
+              <Link to="/seller-dashboard" className="text-white hover:text-yellow-300 transition">{t('navbar.dashboard')}</Link>
             )}
             {isAuthenticated && user?.userType === "buyer" && (
-              <Link
-                to="/farmer-dashboard"
-                className="text-white hover:text-yellow-300 transition"
-              >
-                Dashboard
-              </Link>
+              <Link to="/farmer-dashboard" className="text-white hover:text-yellow-300 transition">{t('navbar.dashboard')}</Link>
             )}
           </div>
 
           {/* User & Cart Menu */}
           <div className="flex items-center space-x-4">
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className="hidden md:flex items-center gap-1 bg-white bg-opacity-20 hover:bg-opacity-30 text-white text-sm font-semibold px-3 py-1.5 rounded-full transition-all border border-white border-opacity-30"
+              title="Switch Language"
+            >
+              <span>{i18n.language === 'en' ? '🇮🇳 हिंदी' : '🇬🇧 English'}</span>
+            </button>
+
             {/* Show either login/register buttons or user info & logout button */}
             <div className="hidden md:flex items-center space-x-3">
               {!isAuthenticated ? (
-                // Not authenticated - show login/register buttons
                 <>
                   <Link
                     to="/login"
                     className="flex items-center bg-yellow-400 hover:bg-yellow-500 text-green-800 font-medium py-1.5 px-4 rounded transition-colors"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-1.5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 3a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm1 4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V8a1 1 0 00-1-1H4zm7 4a1 1 0 11-2 0 1 1 0 012 0z"
-                        clipRule="evenodd"
-                      />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm1 4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V8a1 1 0 00-1-1H4zm7 4a1 1 0 11-2 0 1 1 0 012 0z" clipRule="evenodd" />
                     </svg>
-                    Login
+                    {t('navbar.login')}
                   </Link>
-                  <Link
-                    to="/register"
-                    className="flex items-center text-white hover:text-yellow-300 transition-colors"
-                  >
-                    Register
+                  <Link to="/register" className="flex items-center text-white hover:text-yellow-300 transition-colors">
+                    {t('navbar.register')}
                   </Link>
                 </>
               ) : (
-                // Authenticated - show user info & logout button
                 <div className="flex items-center">
                   <div className="relative">
                     <button
@@ -181,50 +137,27 @@ const Navbar = () => {
                       className="flex items-center text-white hover:text-yellow-300 transition-colors focus:outline-none"
                     >
                       <span className="mr-2">{user?.name}</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                          clipRule="evenodd"
-                        />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                       </svg>
                     </button>
-
-                    {/* Dropdown menu */}
                     {isProfileOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                         {user?.userType === "seller" && (
-                          <Link
-                            to="/seller-dashboard"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsProfileOpen(false)}
-                          >
-                            Seller Dashboard
+                          <Link to="/seller-dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsProfileOpen(false)}>
+                            {t('navbar.sellerDashboard')}
                           </Link>
                         )}
                         {user?.userType === "buyer" && (
-                          <Link
-                            to="/farmer-dashboard"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsProfileOpen(false)}
-                          >
-                            Dashboard
+                          <Link to="/farmer-dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsProfileOpen(false)}>
+                            {t('navbar.dashboard')}
                           </Link>
                         )}
-
                         <button
-                          onClick={() => {
-                            handleLogout();
-                            setIsProfileOpen(false);
-                          }}
+                          onClick={() => { handleLogout(); setIsProfileOpen(false); }}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          Logout
+                          {t('navbar.logout')}
                         </button>
                       </div>
                     )}
@@ -293,114 +226,55 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-green-600">
-            <Link
-              to="/"
-              className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/marketplace"
-              className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Market Place
-            </Link>
-            <Link
-              to="/market-price"
-              className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Market Price
-            </Link>
-            <Link
-              to="/weather"
-              className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Weather
-            </Link>
-            <Link
-              to="/govt-schemes"
-              className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Govt Schemes
-            </Link>
+            <Link to="/" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.home')}</Link>
+            <Link to="/marketplace" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.marketplace')}</Link>
+            <Link to="/market-price" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.marketPrice')}</Link>
+            <Link to="/weather" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.weather')}</Link>
+            <Link to="/govt-schemes" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.govtSchemes')}</Link>
 
-            {/* Show dashboard links based on user type */}
             {isAuthenticated && user?.userType === "seller" && (
-              <Link
-                to="/seller-dashboard"
-                className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
+              <Link to="/seller-dashboard" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.dashboard')}</Link>
             )}
             {isAuthenticated && user?.userType === "buyer" && (
-              <Link
-                to="/farmer-dashboard"
-                className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
+              <Link to="/farmer-dashboard" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.dashboard')}</Link>
             )}
 
             <div className="border-t border-green-600 my-2"></div>
 
             {!isAuthenticated ? (
-              // Not authenticated - show login/register options
               <>
-                <Link
-                  to="/login"
-                  className="flex items-center py-2 text-white hover:bg-green-600 px-4 rounded"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-1.5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 3a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm1 4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V8a1 1 0 00-1-1H4zm7 4a1 1 0 11-2 0 1 1 0 012 0z"
-                      clipRule="evenodd"
-                    />
+                <Link to="/login" className="flex items-center py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm1 4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V8a1 1 0 00-1-1H4zm7 4a1 1 0 11-2 0 1 1 0 012 0z" clipRule="evenodd" />
                   </svg>
-                  Login
+                  {t('navbar.login')}
                 </Link>
-                <Link
-                  to="/register"
-                  className="block py-2 text-white hover:bg-green-600 px-4 rounded"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Register
+                <Link to="/register" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>
+                  {t('navbar.register')}
                 </Link>
               </>
             ) : (
-              // Authenticated - show profile & logout options
               <>
                 {user && (
-                  <div className="px-4 py-2 text-white font-medium">
-                    Hello, {user.name}
-                  </div>
+                  <div className="px-4 py-2 text-white font-medium">Hello, {user.name}</div>
                 )}
-
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMenuOpen(false);
-                  }}
+                  onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                   className="block w-full text-left py-2 text-white hover:bg-green-600 px-4 rounded"
                 >
-                  Logout
+                  {t('navbar.logout')}
                 </button>
               </>
             )}
+
+            {/* Mobile Language Toggle */}
+            <div className="border-t border-green-600 my-2"></div>
+            <button
+              onClick={() => { toggleLanguage(); setIsMenuOpen(false); }}
+              className="flex items-center gap-2 py-2 px-4 text-white hover:bg-green-600 rounded w-full"
+            >
+              <span>{i18n.language === 'en' ? '🇮🇳 हिंदी में देखें' : '🇬🇧 View in English'}</span>
+            </button>
           </div>
         )}
       </div>

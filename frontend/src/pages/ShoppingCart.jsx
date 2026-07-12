@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import {
@@ -15,6 +16,7 @@ const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "YOUR_KEY_ID";
 
 const ShoppingCart = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [checkoutStep, setCheckoutStep] = useState(1); // 1: Cart, 2: Address, 3: Payment, 4: Confirmation

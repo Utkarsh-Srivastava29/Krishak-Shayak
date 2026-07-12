@@ -11,13 +11,15 @@ import {
   FaShoppingBasket,
 } from "react-icons/fa";
 import { MdError, MdCheckCircle } from "react-icons/md";
-import "./styles/animations.css"; // Add this import for animations
+import { useTranslation } from "react-i18next";
+import "./styles/animations.css";
 import Header from "../components/Navbar";
 import Footer from "../components/Footer";
-import authService from "../services/authService"; // Import the authService
+import authService from "../services/authService";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",

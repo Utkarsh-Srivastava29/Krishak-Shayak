@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ShopCard from "../components/marketplace/ShopCard";
 import { getAllShops } from "../services/marketplaceService";
 
 const Marketplace = () => {
+  const { t } = useTranslation();
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,27 +50,16 @@ const Marketplace = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Agricultural Marketplace - Shops
+            {t('marketplace.title')}
           </h1>
           <Link
             to="/marketplace/seller"
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md inline-flex items-center"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            Sell Product
+            {t('marketplace.sellProduct')}
           </Link>
         </div>
 
@@ -78,7 +69,7 @@ const Marketplace = () => {
             <div className="relative flex-grow">
               <input
                 type="text"
-                placeholder="Search for shops..."
+                placeholder={t('marketplace.searchPlaceholder')}
                 className="w-full px-4 py-3 rounded-l-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -151,17 +142,17 @@ const Marketplace = () => {
                 />
               </svg>
               <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                No shops found
+                {t('marketplace.noShops')}
               </h2>
               <p className="text-gray-500">
-                Try adjusting your search to find shops.
+                {t('marketplace.noShopsHint')}
               </p>
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
                   className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                 >
-                  Clear Search
+                  {t('marketplace.clearSearch')}
                 </button>
               )}
             </div>

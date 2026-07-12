@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { fetchProductById, addToCart } from "../services/marketplaceService";
@@ -7,6 +8,7 @@ import { fetchProductById, addToCart } from "../services/marketplaceService";
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);

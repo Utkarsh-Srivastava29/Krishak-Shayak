@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import authService from "../services/authService";
 import { getMyOrders } from "../services/marketplaceService";
 
 const FarmerDashboard = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("details"); // details, orders
   const [isEditingProfile, setIsEditingProfile] = useState(false);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 import Header from "../components/Navbar";
@@ -8,6 +9,7 @@ import { authService } from "../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -36,13 +38,13 @@ const Login = () => {
     const newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('login.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = t('login.emailInvalid');
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = t('login.passwordRequired');
     }
 
     setErrors(newErrors);
@@ -108,7 +110,7 @@ const Login = () => {
         // The request was made but no response was received
         console.error("Error request:", error.request);
         errorMessage =
-          "No response from server. Please check your internet connection.";
+        errorMessage = t('login.noResponse');
       } else {
         // Something happened in setting up the request that triggered an Error
         console.error("Error message:", error.message);
@@ -137,10 +139,10 @@ const Login = () => {
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-green-700 to-green-600 py-4 px-6">
             <h2 className="text-center text-2xl font-bold text-white">
-              Login to your account
+              {t('login.title')}
             </h2>
             <p className="mt-2 text-center text-sm text-yellow-200">
-              Welcome back to Krishak Shayak
+              {t('login.subtitle')}
             </p>
           </div>
 
@@ -171,7 +173,7 @@ const Login = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Email Address
+                  {t('login.emailLabel')}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -204,7 +206,7 @@ const Login = () => {
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Password
+                  {t('login.passwordLabel')}
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -246,7 +248,7 @@ const Login = () => {
                     htmlFor="remember-me"
                     className="ml-2 block text-sm text-gray-700"
                   >
-                    Remember me
+                    {t('login.rememberMe')}
                   </label>
                 </div>
 
@@ -255,7 +257,7 @@ const Login = () => {
                     to="/forgot-password"
                     className="font-medium text-green-600 hover:text-green-500"
                   >
-                    Forgot your password?
+                    {t('login.forgotPassword')}
                   </Link>
                 </div>
               </div>
@@ -296,10 +298,10 @@ const Login = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Logging in...
+                      {t('login.signingIn')}
                     </>
                   ) : (
-                    "Sign in"
+                    "{t('login.signIn')}"
                   )}
                 </button>
               </div>
@@ -313,7 +315,7 @@ const Login = () => {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white text-gray-500">
-                    Or continue with
+                    {t('login.orContinueWith')}
                   </span>
                 </div>
               </div>
@@ -351,12 +353,12 @@ const Login = () => {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                {t('login.noAccount')}{" "}
                 <Link
                   to="/register"
                   className="font-medium text-green-600 hover:text-green-500"
                 >
-                  Register now
+                  {t('login.registerNow')}
                 </Link>
               </p>
             </div>

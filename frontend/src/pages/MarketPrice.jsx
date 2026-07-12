@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const MarketPrice = () => {
+  const { t } = useTranslation();
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedMarket, setSelectedMarket] = useState("");
@@ -142,7 +144,7 @@ const MarketPrice = () => {
 
   const handleFetchPrices = async () => {
     if (!selectedState) {
-      setError("Please select a state");
+      setError(t('marketPrice.pleaseSelectState'));
       return;
     }
 
@@ -236,36 +238,36 @@ const MarketPrice = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-green-800 mb-3">
-              Market Price Information
+              {t('marketPrice.title')}
             </h1>
             <p className="text-lg text-gray-600">
-              Get real-time commodity prices across different markets in India
+              {t('marketPrice.subtitle')}
             </p>
           </div>
 
           {/* Search Form */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Search Market Prices
+              {t('marketPrice.searchTitle')}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {/* State Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select State *
+                  {t('marketPrice.selectState')}
                 </label>
                 <select
                   value={selectedState}
                   onChange={(e) => {
                     setSelectedState(e.target.value);
-                    setSelectedMarket(""); // Reset market when state changes
+                    setSelectedMarket("");
                   }}
                   disabled={loadingStates}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="">
-                    {loadingStates ? "Loading states..." : "Choose a state"}
+                    {loadingStates ? t('marketPrice.loadingStates') : t('marketPrice.chooseState')}
                   </option>
                   {states.map((state) => (
                     <option key={state} value={state}>
@@ -278,13 +280,13 @@ const MarketPrice = () => {
               {/* District Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  District (Optional)
+                  {t('marketPrice.district')}
                 </label>
                 <input
                   type="text"
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
-                  placeholder="Enter district name"
+                  placeholder={t('marketPrice.districtPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
@@ -292,7 +294,7 @@ const MarketPrice = () => {
               {/* Market Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Market/City (Optional)
+                  {t('marketPrice.marketCity')}
                 </label>
                 <select
                   value={selectedMarket}
@@ -302,10 +304,10 @@ const MarketPrice = () => {
                 >
                   <option value="">
                     {!selectedState
-                      ? "Select a state first"
+                      ? t('marketPrice.selectStateFirst')
                       : loadingCities
-                      ? "Loading cities..."
-                      : "Choose a city"}
+                      ? t('marketPrice.loadingCities')
+                      : t('marketPrice.chooseCity')}
                   </option>
                   {cities.map((city) => (
                     <option key={city} value={city}>
@@ -318,13 +320,13 @@ const MarketPrice = () => {
               {/* Commodity Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Commodity (Optional)
+                  {t('marketPrice.commodity')}
                 </label>
                 <input
                   type="text"
                   value={selectedCommodity}
                   onChange={(e) => setSelectedCommodity(e.target.value)}
-                  placeholder="e.g., Wheat, Rice, Potato"
+                  placeholder={t('marketPrice.commodityPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
@@ -332,27 +334,26 @@ const MarketPrice = () => {
               {/* Variety Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Variety (Optional)
+                  {t('marketPrice.variety')}
                 </label>
                 <input
                   type="text"
                   value={selectedVariety}
                   onChange={(e) => setSelectedVariety(e.target.value)}
-                  placeholder="Enter variety"
+                  placeholder={t('marketPrice.varietyPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
-              {/* Grade Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Grade (Optional)
+                  {t('marketPrice.grade')}
                 </label>
                 <input
                   type="text"
                   value={selectedGrade}
                   onChange={(e) => setSelectedGrade(e.target.value)}
-                  placeholder="Enter grade"
+                  placeholder={t('marketPrice.gradePlaceholder')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
@@ -387,7 +388,7 @@ const MarketPrice = () => {
                   Loading...
                 </span>
               ) : (
-                "Get Market Prices"
+                t('marketPrice.fetchPrices')
               )}
             </button>
 
@@ -403,45 +404,25 @@ const MarketPrice = () => {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-800">
-                  Market Price Results ({marketData.length} records found)
+                  {t('marketPrice.resultsTitle')} ({marketData.length} records found)
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Showing {indexOfFirstItem + 1}-
-                  {Math.min(indexOfLastItem, marketData.length)} of{" "}
-                  {marketData.length}
+                  {t('marketPrice.showing', { from: indexOfFirstItem + 1, to: Math.min(indexOfLastItem, marketData.length), total: marketData.length })}
                 </p>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        State
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        District
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Market
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Commodity
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Variety
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Arrival Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Min Price (₹)
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Max Price (₹)
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Modal Price (₹)
-                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.state')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.districtCol')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.market')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.commodityCol')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.varietyCol')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.date')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.minPrice')} (₹)</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.maxPrice')} (₹)</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('marketPrice.modalPrice')} (₹)</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -488,7 +469,7 @@ const MarketPrice = () => {
                     disabled={currentPage === 1}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Previous
+                    {t('marketPrice.previous')}
                   </button>
 
                   <div className="flex gap-2">
@@ -554,7 +535,7 @@ const MarketPrice = () => {
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Next
+                  {t('marketPrice.next')}
                   </button>
                 </div>
               )}

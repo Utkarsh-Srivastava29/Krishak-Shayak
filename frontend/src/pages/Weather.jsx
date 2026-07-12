@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import {
@@ -11,6 +12,7 @@ import {
 } from "../services/weatherService";
 
 const Weather = () => {
+  const { t } = useTranslation();
   const [location, setLocation] = useState("");
   const [weatherData, setWeatherData] = useState(null);
   const [hourlyData, setHourlyData] = useState(null);

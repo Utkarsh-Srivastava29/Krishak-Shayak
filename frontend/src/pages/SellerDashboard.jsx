@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import {
@@ -13,6 +14,7 @@ import {
 import authService from "../services/authService";
 
 const SellerDashboard = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);

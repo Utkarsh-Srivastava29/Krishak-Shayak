@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <section className="relative bg-green-700 text-white">
@@ -15,24 +17,23 @@ const Hero = () => {
       <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <div className="max-w-3xl">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Empowering Farmers with Technology
+            {t('hero.title')}
           </h1>
           <p className="text-xl mb-8">
-            Get personalized crop recommendations, weather updates, market
-            prices, and expert advice - all in one place.
+            {t('hero.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               onClick={() => navigate("/market-price")}
               className="bg-yellow-500 hover:bg-yellow-600 text-green-900 font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105"
             >
-              Check Market Prices
+              {t('hero.checkPrices')}
             </button>
             <button
               onClick={() => navigate("/marketplace")}
               className="bg-white hover:bg-gray-100 text-green-800 font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105"
             >
-              Farmer's Shop
+              {t('hero.farmersShop')}
             </button>
           </div>
         </div>

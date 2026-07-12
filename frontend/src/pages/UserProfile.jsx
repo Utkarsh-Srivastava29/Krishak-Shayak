@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { getUserProfile, updateUserProfile } from "../services/userService";
 
 const UserProfile = () => {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState({
     name: "",
     email: "",

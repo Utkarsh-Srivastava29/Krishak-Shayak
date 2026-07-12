@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { getAllSchemes } from "../services/schemeService";
 
 const GovtSchemes = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [expandedScheme, setExpandedScheme] = useState(null);
@@ -54,11 +56,10 @@ const GovtSchemes = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-green-800 mb-3">
-            Government Schemes for Farmers
+            {t('govtSchemes.title')}
           </h1>
           <p className="text-lg text-gray-600">
-            Explore various central government schemes designed to support and
-            empower farmers across India
+            {t('govtSchemes.subtitle')}
           </p>
         </div>
 
@@ -67,7 +68,7 @@ const GovtSchemes = () => {
           <div className="flex flex-col items-center justify-center py-20">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mb-4"></div>
             <p className="text-gray-600 text-lg">
-              Loading government schemes...
+              {t('govtSchemes.loading')}
             </p>
           </div>
         )}
@@ -91,14 +92,14 @@ const GovtSchemes = () => {
               </svg>
               <div>
                 <h3 className="text-red-800 font-semibold mb-1">
-                  Error Loading Schemes
+                  {t('govtSchemes.errorTitle')}
                 </h3>
                 <p className="text-red-600">{error}</p>
                 <button
                   onClick={() => window.location.reload()}
                   className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                 >
-                  Retry
+                  {t('govtSchemes.retry')}
                 </button>
               </div>
             </div>
@@ -114,14 +115,14 @@ const GovtSchemes = () => {
                 {/* Search Bar */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Search Schemes
+                    {t('govtSchemes.searchLabel')}
                   </label>
                   <div className="relative">
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search by scheme name or description..."
+                      placeholder={t('govtSchemes.searchPlaceholder')}
                       className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                     <svg
@@ -143,14 +144,14 @@ const GovtSchemes = () => {
                 {/* Department Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Filter by Department
+                    {t('govtSchemes.filterLabel')}
                   </label>
                   <select
                     value={selectedDepartment}
                     onChange={(e) => setSelectedDepartment(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
-                    <option value="">All Departments</option>
+                    <option value="">{t('govtSchemes.allDepartments')}</option>
                     {departments.map((dept, index) => (
                       <option key={index} value={dept}>
                         {dept}
@@ -161,7 +162,7 @@ const GovtSchemes = () => {
               </div>
 
               <div className="mt-4 text-sm text-gray-600">
-                Showing {filteredSchemes.length} of {schemes.length} schemes
+                {t('govtSchemes.showing', { filtered: filteredSchemes.length, total: schemes.length })}
               </div>
             </div>
 
@@ -187,7 +188,7 @@ const GovtSchemes = () => {
                             {scheme.department}
                           </span>
                           <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                            Launched:{" "}
+                            {t('govtSchemes.launched')}{" "}
                             {new Date(scheme.launch_date).getFullYear()}
                           </span>
                         </div>
@@ -234,7 +235,7 @@ const GovtSchemes = () => {
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
-                            Eligibility
+                            {t('govtSchemes.eligibility')}
                           </h4>
                           <p className="text-gray-600 ml-7">
                             {scheme.eligibility}
@@ -256,7 +257,7 @@ const GovtSchemes = () => {
                                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
-                            Benefits
+                            {t('govtSchemes.benefits')}
                           </h4>
                           <p className="text-gray-600 ml-7">
                             {scheme.benefits}
@@ -270,7 +271,7 @@ const GovtSchemes = () => {
                             rel="noopener noreferrer"
                             className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
                           >
-                            Visit Official Website
+                            {t('govtSchemes.visitWebsite')}
                             <svg
                               className="ml-2 h-5 w-5"
                               fill="none"
@@ -310,10 +311,10 @@ const GovtSchemes = () => {
                   />
                 </svg>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No schemes found
+                  {t('govtSchemes.noSchemes')}
                 </h3>
                 <p className="text-gray-600">
-                  Try adjusting your search or filter criteria
+                  {t('govtSchemes.noSchemesHint')}
                 </p>
               </div>
             )}
