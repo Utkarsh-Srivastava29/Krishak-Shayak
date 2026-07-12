@@ -301,7 +301,7 @@ const Login = () => {
                       {t('login.signingIn')}
                     </>
                   ) : (
-                    "{t('login.signIn')}"
+                    t('login.signIn')
                   )}
                 </button>
               </div>

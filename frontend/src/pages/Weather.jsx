@@ -172,7 +172,7 @@ const Weather = () => {
 
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Weather Forecast
+          {t('weather.title')}
         </h1>
 
         {/* Search Bar */}
@@ -180,7 +180,7 @@ const Weather = () => {
           <form onSubmit={handleSearch} className="flex">
             <input
               type="text"
-              placeholder="Enter location (e.g., Delhi, IN)"
+              placeholder={t('weather.placeholder')}
               className="flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               value={location}
               onChange={handleLocationChange}
@@ -212,10 +212,10 @@ const Weather = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Loading
+                  {t('weather.loading')}
                 </span>
               ) : (
-                "Search"
+                t('weather.search')
               )}
             </button>
           </form>
@@ -232,7 +232,7 @@ const Weather = () => {
                     onClick={() => {
                       setLocation(suggestion);
                       setShowSuggestions(false);
-                      const mockEvent = { preventDefault: () => {} };
+                      const mockEvent = { preventDefault: () => { } };
                       handleSearch(mockEvent);
                     }}
                   >
@@ -247,7 +247,7 @@ const Weather = () => {
         {/* Popular Cities Quick Selection */}
         <div className="max-w-md mx-auto mb-8">
           <p className="text-center text-sm text-gray-600 mb-2">
-            Popular Cities:
+            {t('weather.popularCities')}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {[
@@ -261,7 +261,7 @@ const Weather = () => {
                 key={city}
                 onClick={() => {
                   setLocation(city);
-                  const mockEvent = { preventDefault: () => {} };
+                  const mockEvent = { preventDefault: () => { } };
                   handleSearch(mockEvent);
                 }}
                 className="text-sm bg-white border border-gray-300 rounded-full px-3 py-1 hover:bg-green-50 hover:border-green-400 transition"
@@ -286,7 +286,7 @@ const Weather = () => {
                     <h2 className="text-2xl font-bold text-gray-800">
                       {weatherData.location}
                     </h2>
-                    <p className="text-gray-600">Current Weather</p>
+                    <p className="text-gray-600">{t('weather.currentWeather')}</p>
                   </div>
                   <div className="text-5xl mt-4 md:mt-0">
                     {weatherData.current.icon}
@@ -304,17 +304,17 @@ const Weather = () => {
                   </div>
                   <div className="mt-4 md:mt-0">
                     <p className="text-gray-600">
-                      Feels like: {weatherData.current.feelsLike}°C
+                      {t('weather.feelsLike')}: {weatherData.current.feelsLike}°C
                     </p>
                     <p className="text-gray-600">
-                      Humidity: {weatherData.current.humidity}%
+                      {t('weather.humidity')}: {weatherData.current.humidity}%
                     </p>
                     <p className="text-gray-600">
-                      Wind: {weatherData.current.windSpeed} km/h
+                      {t('weather.wind')}: {weatherData.current.windSpeed} km/h
                     </p>
                     {weatherData.current.precipitation !== undefined && (
                       <p className="text-gray-600">
-                        Precipitation:{" "}
+                        {t('weather.precipitation')}:{" "}
                         {parseFloat(weatherData.current.precipitation).toFixed(
                           2
                         )}{" "}
@@ -332,14 +332,13 @@ const Weather = () => {
                   >
                     <span>
                       {showHourlyForecast
-                        ? "Hide Hourly Forecast"
-                        : "Show Hourly Forecast"}
+                        ? t('weather.hideHourly')
+                        : t('weather.showHourly')}
                     </span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className={`h-5 w-5 ml-1 transform ${
-                        showHourlyForecast ? "rotate-180" : ""
-                      }`}
+                      className={`h-5 w-5 ml-1 transform ${showHourlyForecast ? "rotate-180" : ""
+                        }`}
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -391,27 +390,24 @@ const Weather = () => {
                         {hourlyData.map((hour, index) => (
                           <div
                             key={index}
-                            className={`flex-none w-24 p-3 mx-1 rounded-lg transition-all ${
-                              index === 0
+                            className={`flex-none w-24 p-3 mx-1 rounded-lg transition-all ${index === 0
                                 ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md"
                                 : "bg-gray-50 hover:bg-blue-50"
-                            }`}
+                              }`}
                           >
                             <div className="text-center">
                               {/* Time display */}
                               <p
-                                className={`font-medium ${
-                                  index === 0 ? "text-white" : "text-gray-700"
-                                }`}
+                                className={`font-medium ${index === 0 ? "text-white" : "text-gray-700"
+                                  }`}
                               >
                                 {hour.time}
                               </p>
                               <p
-                                className={`text-xs ${
-                                  index === 0
+                                className={`text-xs ${index === 0
                                     ? "text-blue-100"
                                     : "text-gray-500"
-                                }`}
+                                  }`}
                               >
                                 {new Date(
                                   hour.timestamp * 1000
@@ -423,39 +419,35 @@ const Weather = () => {
                               {/* Weather icon and temperature */}
                               <div className="text-2xl my-2">{hour.icon}</div>
                               <p
-                                className={`text-xl font-bold ${
-                                  index === 0 ? "text-white" : "text-gray-800"
-                                }`}
+                                className={`text-xl font-bold ${index === 0 ? "text-white" : "text-gray-800"
+                                  }`}
                               >
                                 {hour.temp}°C
                               </p>
                               <p
-                                className={`text-xs ${
-                                  index === 0
+                                className={`text-xs ${index === 0
                                     ? "text-blue-100"
                                     : "text-gray-600"
-                                }`}
+                                  }`}
                               >
                                 {hour.condition}
                               </p>
 
                               {/* Divider */}
                               <div
-                                className={`${
-                                  index === 0
+                                className={`${index === 0
                                     ? "border-t border-blue-400"
                                     : "border-t border-gray-200"
-                                } my-1`}
+                                  } my-1`}
                               ></div>
 
                               {/* Compact weather details */}
                               <div className="grid grid-cols-2 gap-x-1 gap-y-1 text-xs mt-1">
                                 <div
-                                  className={`flex items-center ${
-                                    index === 0
+                                  className={`flex items-center ${index === 0
                                       ? "text-blue-100"
                                       : "text-gray-500"
-                                  }`}
+                                    }`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -474,11 +466,10 @@ const Weather = () => {
                                   {hour.precipProbability}%
                                 </div>
                                 <div
-                                  className={`flex items-center ${
-                                    index === 0
+                                  className={`flex items-center ${index === 0
                                       ? "text-blue-100"
                                       : "text-gray-500"
-                                  }`}
+                                    }`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -497,11 +488,10 @@ const Weather = () => {
                                   {hour.windSpeed}
                                 </div>
                                 <div
-                                  className={`flex items-center ${
-                                    index === 0
+                                  className={`flex items-center ${index === 0
                                       ? "text-blue-100"
                                       : "text-gray-500"
-                                  }`}
+                                    }`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -520,11 +510,10 @@ const Weather = () => {
                                   {hour.humidity}%
                                 </div>
                                 <div
-                                  className={`flex items-center ${
-                                    index === 0
+                                  className={`flex items-center ${index === 0
                                       ? "text-blue-100"
                                       : "text-gray-500"
-                                  }`}
+                                    }`}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -776,19 +765,18 @@ const Weather = () => {
                       {soilMoisture < 0.3
                         ? "Low"
                         : soilMoisture > 0.7
-                        ? "High"
-                        : "Moderate"}
+                          ? "High"
+                          : "Moderate"}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-4">
                     <div
-                      className={`h-4 rounded-full ${
-                        soilMoisture < 0.3
+                      className={`h-4 rounded-full ${soilMoisture < 0.3
                           ? "bg-orange-500"
                           : soilMoisture > 0.7
-                          ? "bg-blue-500"
-                          : "bg-green-500"
-                      }`}
+                            ? "bg-blue-500"
+                            : "bg-green-500"
+                        }`}
                       style={{ width: `${soilMoisture * 100}%` }}
                     ></div>
                   </div>
@@ -801,8 +789,8 @@ const Weather = () => {
                     {soilMoisture < 0.3
                       ? "Soil moisture is low. Consider irrigation to prevent crop stress."
                       : soilMoisture > 0.7
-                      ? "Soil moisture is high. Monitor for potential waterlogging issues."
-                      : "Soil moisture is at an optimal level for most crops."}
+                        ? "Soil moisture is high. Monitor for potential waterlogging issues."
+                        : "Soil moisture is at an optimal level for most crops."}
                   </p>
                 </div>
               </div>

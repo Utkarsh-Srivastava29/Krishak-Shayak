@@ -262,7 +262,18 @@
     "myOrders": "My Orders",
     "browseMarket": "Browse Marketplace",
     "checkPrices": "Check Market Prices",
-    "govtSchemes": "Govt Schemes"
+    "govtSchemes": "Govt Schemes",
+    "welcomeBack": "Welcome back, {{name}}! 🌾",
+    "subtitle": "Manage your profile and track your orders",
+    "farmerDetails": "Farmer Details",
+    "farmerProfile": "Farmer Profile",
+    "personalAndFarm": "Your personal and farm information",
+    "editProfile": "Edit Profile",
+    "personalInfo": "Personal Information",
+    "fullName": "Full Name",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "locationDetails": "Location Details"
   },
   "sellerDashboard": {
     "title": "Seller Dashboard",
@@ -275,5 +286,21 @@
     "totalProducts": "Total Products",
     "noProducts": "No products yet",
     "noProductsHint": "Add your first product to get started"
+  },
+  "weather": {
+    "title": "Weather Forecast",
+    "placeholder": "Enter location (e.g., Delhi, IN)",
+    "loading": "Loading",
+    "search": "Search",
+    "popularCities": "Popular Cities:",
+    "currentWeather": "Current Weather",
+    "feelsLike": "Feels like",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "precipitation": "Precipitation",
+    "showHourly": "Show Hourly Forecast",
+    "hideHourly": "Hide Hourly Forecast",
+    "extended": "Extended Forecast",
+    "days": "Days"
   }
 }

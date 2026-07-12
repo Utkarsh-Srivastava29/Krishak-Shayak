@@ -262,7 +262,18 @@
     "myOrders": "मेरे ऑर्डर",
     "browseMarket": "बाज़ार ब्राउज़ करें",
     "checkPrices": "बाज़ार भाव देखें",
-    "govtSchemes": "सरकारी योजनाएं"
+    "govtSchemes": "सरकारी योजनाएं",
+    "welcomeBack": "वापसी पर स्वागत है, {{name}}! 🌾",
+    "subtitle": "अपनी प्रोफ़ाइल प्रबंधित करें और अपने ऑर्डर ट्रैक करें",
+    "farmerDetails": "किसान विवरण",
+    "farmerProfile": "किसान प्रोफ़ाइल",
+    "personalAndFarm": "आपकी व्यक्तिगत और कृषि जानकारी",
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "fullName": "पूरा नाम",
+    "emailAddress": "ईमेल पता",
+    "phoneNumber": "फ़ोन नंबर",
+    "locationDetails": "स्थान विवरण"
   },
   "sellerDashboard": {
     "title": "विक्रेता डैशबोर्ड",
@@ -275,5 +286,21 @@
     "totalProducts": "कुल उत्पाद",
     "noProducts": "अभी तक कोई उत्पाद नहीं",
     "noProductsHint": "शुरू करने के लिए अपना पहला उत्पाद जोड़ें"
+  },
+  "weather": {
+    "title": "मौसम का पूर्वानुमान",
+    "placeholder": "स्थान दर्ज करें (जैसे, दिल्ली, IN)",
+    "loading": "लोड हो रहा है",
+    "search": "खोजें",
+    "popularCities": "लोकप्रिय शहर:",
+    "currentWeather": "वर्तमान मौसम",
+    "feelsLike": "ऐसा लगता है",
+    "humidity": "नमी",
+    "wind": "हवा",
+    "precipitation": "बारिश",
+    "showHourly": "प्रति घंटा पूर्वानुमान दिखाएं",
+    "hideHourly": "प्रति घंटा पूर्वानुमान छिपाएं",
+    "extended": "विस्तारित पूर्वानुमान",
+    "days": "दिन"
   }
 }

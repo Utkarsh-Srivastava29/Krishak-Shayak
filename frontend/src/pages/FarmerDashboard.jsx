@@ -150,10 +150,10 @@ const FarmerDashboard = () => {
         {/* Welcome Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome back, {user?.name || "Farmer"}! 🌾
+            {t('farmerDashboard.welcomeBack', { name: user?.name || "Farmer" })}
           </h1>
           <p className="text-green-100">
-            Manage your profile and track your orders
+            {t('farmerDashboard.subtitle')}
           </p>
         </div>
 
@@ -196,7 +196,7 @@ const FarmerDashboard = () => {
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                Farmer Details
+                {t('farmerDashboard.farmerDetails')}
               </div>
             </button>
             <button
@@ -222,7 +222,7 @@ const FarmerDashboard = () => {
                     d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                   />
                 </svg>
-                My Orders
+                {t('farmerDashboard.myOrders')}
               </div>
             </button>
           </nav>
@@ -236,10 +236,10 @@ const FarmerDashboard = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-1">
-                    Farmer Profile
+                    {t('farmerDashboard.farmerProfile')}
                   </h2>
                   <p className="text-green-100">
-                    Your personal and farm information
+                    {t('farmerDashboard.personalAndFarm')}
                   </p>
                 </div>
                 {!isEditingProfile && (
@@ -261,7 +261,7 @@ const FarmerDashboard = () => {
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    Edit Profile
+                    {t('farmerDashboard.editProfile')}
                   </button>
                 )}
               </div>
@@ -289,12 +289,12 @@ const FarmerDashboard = () => {
                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         />
                       </svg>
-                      Personal Information
+                      {t('farmerDashboard.personalInfo')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <label className="text-sm font-medium text-gray-500 mb-2 block">
-                          Full Name
+                          {t('farmerDashboard.fullName')}
                         </label>
                         <p className="text-gray-900 text-lg font-semibold">
                           {farmerData.name || (
