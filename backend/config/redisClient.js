@@ -17,17 +17,19 @@ const connectRedis = async () => {
 
   // Create ioredis client (fully compatible with older Redis versions like Windows native)
   redisClient = new Redis(REDIS_URL, {
+    maxRetriesPerRequest: null,
     retryStrategy(times) {
       if (times > 3) {
         if (!hasLoggedError) {
           console.warn("[REDIS] ⚠️  Could not connect. Server running without cache.");
           hasLoggedError = true;
         }
-        return null; // Stop retrying
+        // Continue retrying with longer intervals for rate limiter reconnection
+        return Math.min(times * 500, 5000);
       }
       return 1000;
     },
-    maxRetriesPerRequest: 1, // Don't block requests if disconnected
+    enableOfflineQueue: true,
   });
 
   redisClient.on("connect", () => {
@@ -41,30 +43,49 @@ const connectRedis = async () => {
   });
 
   redisClient.on("error", (err) => {
-    isConnected = false;
-    if (!hasLoggedError) {
+    if (isConnected || !hasLoggedError) {
       console.error(`[REDIS] ❌ Redis connection error: ${err.message}`);
-      console.warn("[REDIS] ⚠️  Server running without cache. Start Redis and restart server to enable caching.");
-      hasLoggedError = true;
+      if (!hasLoggedError) {
+        console.warn("[REDIS] ⚠️  Server running without cache/rate-limiting. Start Redis and restart server to enable.");
+        hasLoggedError = true;
+      }
     }
+    isConnected = false;
   });
 
   redisClient.on("end", () => {
     isConnected = false;
   });
-  
+
   return redisClient;
 };
 
 /**
  * Get the Redis client instance.
- * Returns null if not connected (allows graceful fallback).
+ * Returns null if not connected (allows graceful fallback for caching).
  */
 const getRedisClient = () => {
   if (redisClient && isConnected) {
     return redisClient;
   }
   return null;
+};
+
+/**
+ * Get the raw Redis client instance regardless of connection state.
+ * Used by the rate limiter for defineCommand() setup.
+ * The rate limiter checks isRedisReady() before executing commands.
+ */
+const getRawRedisClient = () => {
+  return redisClient;
+};
+
+/**
+ * Checks if Redis is currently connected and ready.
+ * Used by the rate limiter for fail-open behavior.
+ */
+const isRedisReady = () => {
+  return isConnected && redisClient && redisClient.status === "ready";
 };
 
 /**
@@ -168,6 +189,8 @@ process.on("SIGTERM", async () => {
 module.exports = {
   connectRedis,
   getRedisClient,
+  getRawRedisClient,
+  isRedisReady,
   getCache,
   setCache,
   delCache,

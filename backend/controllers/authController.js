@@ -1,5 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const {
+  recordFailedLogin,
+  clearFailedLogins,
+} = require("../middleware/rateLimiter");
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -110,6 +114,11 @@ exports.login = async (req, res) => {
 
     // Check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
+      // Clear failed login counter on success
+      const clientIp = res.locals._rateLimitIp || req.ip;
+      const normalizedEmail = res.locals._rateLimitEmail || email.trim().toLowerCase();
+      clearFailedLogins(clientIp, normalizedEmail);
+
       res.json({
         success: true,
         token: generateToken(user._id),
@@ -123,6 +132,11 @@ exports.login = async (req, res) => {
         },
       });
     } else {
+      // Record failed login for exponential backoff
+      const clientIp = res.locals._rateLimitIp || req.ip;
+      const normalizedEmail = res.locals._rateLimitEmail || (email ? email.trim().toLowerCase() : null);
+      recordFailedLogin(clientIp, normalizedEmail);
+
       res.status(401).json({
         success: false,
         message: "Invalid email or password",

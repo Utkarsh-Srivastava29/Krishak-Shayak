@@ -14,11 +14,15 @@ const marketPriceRoutes = require("./routes/marketPriceRoutes");
 const schemeRoutes = require("./routes/schemeRoutes");
 const { connectRedis } = require("./config/redisClient");
 
-// Environment variables are loaded at the top
 
+// Environment variables are loaded at the top
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust proxy for accurate client IP extraction behind reverse proxies
+// Set TRUST_PROXY=1 for single proxy (Render, Railway, Heroku), 2 for double proxy, etc.
+app.set("trust proxy", parseInt(process.env.TRUST_PROXY || "1", 10));
 
 // Middleware
 const allowedOrigins = [
@@ -43,6 +47,7 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Retry-After"],
     credentials: true,
   })
 );
