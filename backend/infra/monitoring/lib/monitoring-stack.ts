@@ -93,10 +93,10 @@ exports.handler = async () => {
     });
 
     // ─────────────────────────────────────────────
-    // 4. SYNTHETICS CANARY: Backend API Health (/api/schemes)
+    // 4. SYNTHETICS CANARY: Schemes API (Google Sheets)
     // ─────────────────────────────────────────────
-    const backendApiCanary = new synthetics.Canary(this, 'BackendApiCanary', {
-      canaryName: 'ks-api-check',
+    const schemesCanary = new synthetics.Canary(this, 'SchemesApiCanary', {
+      canaryName: 'ks-schemes-check',
       schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
@@ -117,7 +117,7 @@ const executeTest = async function () {
   await synthetics.executeHttpStep('Get Schemes Endpoint', requestOptions, (res) => {
     log.info('API returned status: ' + res.statusCode);
     if (res.statusCode >= 400) {
-      throw new Error('API returned HTTP error status: ' + res.statusCode);
+      throw new Error('Schemes API returned HTTP error: ' + res.statusCode);
     }
   });
 };
@@ -131,7 +131,159 @@ exports.handler = async () => {
     });
 
     // ─────────────────────────────────────────────
-    // 5. MONITORING FACADE (cdk-monitoring-constructs)
+    // 5. SYNTHETICS CANARY: Weather API (OpenWeatherMap)
+    // ─────────────────────────────────────────────
+    const weatherCanary = new synthetics.Canary(this, 'WeatherApiCanary', {
+      canaryName: 'ks-weather-check',
+      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      artifactsBucketLocation: { bucket: canaryArtifactsBucket },
+      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
+      test: synthetics.Test.custom({
+        code: synthetics.Code.fromInline(`
+const synthetics = require('Synthetics');
+const log = require('SyntheticsLogger');
+
+const executeTest = async function () {
+  const requestOptions = {
+    hostname: '${domain}',
+    method: 'GET',
+    path: '/api/weather?location=Delhi',
+    port: '443',
+    protocol: 'https:',
+  };
+  log.info('Requesting https://${domain}/api/weather?location=Delhi');
+  await synthetics.executeHttpStep('Get Weather Endpoint', requestOptions, (res) => {
+    log.info('Weather API returned status: ' + res.statusCode);
+    if (res.statusCode >= 400) {
+      throw new Error('Weather API returned HTTP error: ' + res.statusCode);
+    }
+  });
+};
+
+exports.handler = async () => {
+  return await executeTest();
+};
+`),
+        handler: 'index.handler',
+      }),
+    });
+
+    // ─────────────────────────────────────────────
+    // 6. SYNTHETICS CANARY: Market Prices API (Data.gov.in)
+    // ─────────────────────────────────────────────
+    const marketPricesCanary = new synthetics.Canary(this, 'MarketPricesApiCanary', {
+      canaryName: 'ks-market-check',
+      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      artifactsBucketLocation: { bucket: canaryArtifactsBucket },
+      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
+      test: synthetics.Test.custom({
+        code: synthetics.Code.fromInline(`
+const synthetics = require('Synthetics');
+const log = require('SyntheticsLogger');
+
+const executeTest = async function () {
+  const requestOptions = {
+    hostname: '${domain}',
+    method: 'GET',
+    path: '/api/market-prices?state=Delhi',
+    port: '443',
+    protocol: 'https:',
+  };
+  log.info('Requesting https://${domain}/api/market-prices?state=Delhi');
+  await synthetics.executeHttpStep('Get Market Prices Endpoint', requestOptions, (res) => {
+    log.info('Market Prices API returned status: ' + res.statusCode);
+    if (res.statusCode >= 400) {
+      throw new Error('Market Prices API returned HTTP error: ' + res.statusCode);
+    }
+  });
+};
+
+exports.handler = async () => {
+  return await executeTest();
+};
+`),
+        handler: 'index.handler',
+      }),
+    });
+
+    // ─────────────────────────────────────────────
+    // 7. SYNTHETICS CANARY: Products API (MongoDB check)
+    // ─────────────────────────────────────────────
+    const productsCanary = new synthetics.Canary(this, 'ProductsApiCanary', {
+      canaryName: 'ks-products-check',
+      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      artifactsBucketLocation: { bucket: canaryArtifactsBucket },
+      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
+      test: synthetics.Test.custom({
+        code: synthetics.Code.fromInline(`
+const synthetics = require('Synthetics');
+const log = require('SyntheticsLogger');
+
+const executeTest = async function () {
+  const requestOptions = {
+    hostname: '${domain}',
+    method: 'GET',
+    path: '/api/products',
+    port: '443',
+    protocol: 'https:',
+  };
+  log.info('Requesting https://${domain}/api/products');
+  await synthetics.executeHttpStep('Get Products Endpoint', requestOptions, (res) => {
+    log.info('Products API returned status: ' + res.statusCode);
+    if (res.statusCode >= 400) {
+      throw new Error('Products API returned HTTP error: ' + res.statusCode);
+    }
+  });
+};
+
+exports.handler = async () => {
+  return await executeTest();
+};
+`),
+        handler: 'index.handler',
+      }),
+    });
+
+    // ─────────────────────────────────────────────
+    // 8. SYNTHETICS CANARY: Seller Shops API (MongoDB check)
+    // ─────────────────────────────────────────────
+    const shopsCanary = new synthetics.Canary(this, 'ShopsApiCanary', {
+      canaryName: 'ks-shops-check',
+      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      artifactsBucketLocation: { bucket: canaryArtifactsBucket },
+      runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
+      test: synthetics.Test.custom({
+        code: synthetics.Code.fromInline(`
+const synthetics = require('Synthetics');
+const log = require('SyntheticsLogger');
+
+const executeTest = async function () {
+  const requestOptions = {
+    hostname: '${domain}',
+    method: 'GET',
+    path: '/api/seller/shops',
+    port: '443',
+    protocol: 'https:',
+  };
+  log.info('Requesting https://${domain}/api/seller/shops');
+  await synthetics.executeHttpStep('Get Seller Shops Endpoint', requestOptions, (res) => {
+    log.info('Shops API returned status: ' + res.statusCode);
+    if (res.statusCode >= 400) {
+      throw new Error('Shops API returned HTTP error: ' + res.statusCode);
+    }
+  });
+};
+
+exports.handler = async () => {
+  return await executeTest();
+};
+`),
+        handler: 'index.handler',
+      }),
+    });
+
+    // ─────────────────────────────────────────────
+    // 9. MONITORING FACADE (cdk-monitoring-constructs)
     // ─────────────────────────────────────────────
     const monitoring = new MonitoringFacade(this, 'MonitoringFacade', {
       alarmFactoryDefaults: {
@@ -141,7 +293,7 @@ exports.handler = async () => {
       },
     });
 
-    // Monitor Frontend Canary Uptime & Latency
+    // ── Frontend ──
     monitoring.monitorSyntheticsCanary({
       canary: frontendCanary,
       humanReadableName: 'Frontend Web Health',
@@ -157,11 +309,75 @@ exports.handler = async () => {
       },
     });
 
-    // Monitor Backend API Canary Uptime & Latency
+    // ── Schemes API (Google Sheets) ──
     monitoring.monitorSyntheticsCanary({
-      canary: backendApiCanary,
-      humanReadableName: 'Backend Schemes API Health',
-      alarmFriendlyName: 'BackendApiDown',
+      canary: schemesCanary,
+      humanReadableName: 'Schemes API (Google Sheets)',
+      alarmFriendlyName: 'SchemesApiDown',
+      add4xxErrorCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      add5xxFaultCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      addAverageLatencyAlarm: {
+        warning: { maxLatency: cdk.Duration.seconds(8) },
+      },
+    });
+
+    // ── Weather API (OpenWeatherMap) ──
+    monitoring.monitorSyntheticsCanary({
+      canary: weatherCanary,
+      humanReadableName: 'Weather API (OpenWeatherMap)',
+      alarmFriendlyName: 'WeatherApiDown',
+      add4xxErrorCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      add5xxFaultCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      addAverageLatencyAlarm: {
+        warning: { maxLatency: cdk.Duration.seconds(5) },
+      },
+    });
+
+    // ── Market Prices API (Data.gov.in) ──
+    monitoring.monitorSyntheticsCanary({
+      canary: marketPricesCanary,
+      humanReadableName: 'Market Prices API (Data.gov.in)',
+      alarmFriendlyName: 'MarketPricesApiDown',
+      add4xxErrorCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      add5xxFaultCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      addAverageLatencyAlarm: {
+        warning: { maxLatency: cdk.Duration.seconds(8) },
+      },
+    });
+
+    // ── Products API (MongoDB health check) ──
+    monitoring.monitorSyntheticsCanary({
+      canary: productsCanary,
+      humanReadableName: 'Products API (MongoDB)',
+      alarmFriendlyName: 'ProductsApiDown',
+      add4xxErrorCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      add5xxFaultCountAlarm: {
+        critical: { maxErrorCount: 1 },
+      },
+      addAverageLatencyAlarm: {
+        warning: { maxLatency: cdk.Duration.seconds(5) },
+      },
+    });
+
+    // ── Seller Shops API (MongoDB health check) ──
+    monitoring.monitorSyntheticsCanary({
+      canary: shopsCanary,
+      humanReadableName: 'Seller Shops API (MongoDB)',
+      alarmFriendlyName: 'ShopsApiDown',
       add4xxErrorCountAlarm: {
         critical: { maxErrorCount: 1 },
       },
@@ -174,7 +390,7 @@ exports.handler = async () => {
     });
 
     // ─────────────────────────────────────────────
-    // 6. OUTPUTS
+    // 10. OUTPUTS
     // ─────────────────────────────────────────────
     new cdk.CfnOutput(this, 'DashboardUrl', {
       description: 'CloudWatch Executive Dashboard URL',
