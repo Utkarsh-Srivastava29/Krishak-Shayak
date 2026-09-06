@@ -103,9 +103,17 @@ const Login = () => {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.error("Error response:", error.response.data);
-        errorMessage =
-          error.response.data.message ||
-          "Server error: " + error.response.status;
+        if (error.response.status === 429) {
+          // Rate limited — show retry-after countdown if available
+          const retryAfter = error.response.headers["retry-after"];
+          errorMessage = retryAfter
+            ? `Too many login attempts. Please try again in ${Math.ceil(Number(retryAfter))} seconds.`
+            : error.response.data.message || "Too many login attempts. Please try again later.";
+        } else {
+          errorMessage =
+            error.response.data.message ||
+            "Server error: " + error.response.status;
+        }
       } else if (error.request) {
         // The request was made but no response was received
         console.error("Error request:", error.request);
