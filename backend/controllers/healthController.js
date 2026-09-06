@@ -1,4 +1,9 @@
-const { CloudWatchClient, DescribeAlarmsCommand, GetMetricDataCommand } = require("@aws-sdk/client-cloudwatch");
+const {
+  CloudWatchClient,
+  DescribeAlarmsCommand,
+  GetMetricDataCommand,
+  GetMetricWidgetImageCommand,
+} = require("@aws-sdk/client-cloudwatch");
 const mongoose = require("mongoose");
 const { isRedisReady, getCache, setCache } = require("../config/redisClient");
 
@@ -353,8 +358,12 @@ const getMetricChart = async (req, res) => {
     res.setHeader("Cache-Control", "public, max-age=60");
     return res.send(imageBuffer);
   } catch (err) {
-    console.error("[HEALTH] Error generating metric chart:", err.message);
-    return res.status(500).send("Failed to render metric chart");
+    console.error("[HEALTH] Error generating metric chart:", err);
+    return res.status(500).json({
+      message: "Failed to render metric chart",
+      error: err.message,
+      code: err.name || err.code,
+    });
   }
 };
 
