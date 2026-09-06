@@ -228,6 +228,137 @@ const getHealthStatus = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/health/chart?type=uptime|latency|errors&hours=3
+ * Returns rendered CloudWatch PNG metric widget image
+ */
+const getMetricChart = async (req, res) => {
+  try {
+    if (!cwClient) {
+      return res.status(503).send("CloudWatch client not configured");
+    }
+
+    const type = req.query.type || "uptime";
+    const hours = parseInt(req.query.hours || "3", 10);
+    const startRange = `-PT${Math.min(Math.max(hours, 1), 24)}H`;
+
+    const cacheKey = `health:chart:${type}:${hours}`;
+    const cachedBase64 = await getCache(cacheKey);
+    if (cachedBase64) {
+      const imgBuffer = Buffer.from(cachedBase64, "base64");
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=60");
+      return res.send(imgBuffer);
+    }
+
+    const canaries = [
+      { name: "ks-frontend-check", label: "Frontend Web", color: "#10b981" },
+      { name: "ks-schemes-check", label: "Schemes API", color: "#3b82f6" },
+      { name: "ks-weather-check", label: "Weather API", color: "#f59e0b" },
+      { name: "ks-market-check", label: "Market Prices", color: "#06b6d4" },
+      { name: "ks-products-check", label: "Products Catalog", color: "#8b5cf6" },
+      { name: "ks-shops-check", label: "Seller Shops", color: "#ec4899" },
+    ];
+
+    let widgetConfig = {};
+
+    if (type === "latency") {
+      widgetConfig = {
+        title: "Canary Latency & Response Duration (ms)",
+        view: "timeSeries",
+        stacked: false,
+        theme: "light",
+        width: 800,
+        height: 340,
+        start: startRange,
+        end: "P0D",
+        period: 300,
+        stat: "Average",
+        yAxis: {
+          left: { label: "Milliseconds", min: 0 },
+        },
+        metrics: canaries.map((c) => [
+          "CloudWatchSynthetics",
+          "Duration",
+          "CanaryName",
+          c.name,
+          { label: c.label, color: c.color },
+        ]),
+      };
+    } else if (type === "errors") {
+      widgetConfig = {
+        title: "Canary Failure & Fault Count",
+        view: "timeSeries",
+        stacked: false,
+        theme: "light",
+        width: 800,
+        height: 340,
+        start: startRange,
+        end: "P0D",
+        period: 300,
+        stat: "Sum",
+        yAxis: {
+          left: { label: "Failed Executions", min: 0 },
+        },
+        metrics: canaries.map((c) => [
+          "CloudWatchSynthetics",
+          "Failed",
+          "CanaryName",
+          c.name,
+          { label: `${c.label} Failures`, color: c.color },
+        ]),
+      };
+    } else {
+      // Default: Uptime / SuccessPercent
+      widgetConfig = {
+        title: "Canary Success Rate (%)",
+        view: "timeSeries",
+        stacked: false,
+        theme: "light",
+        width: 800,
+        height: 340,
+        start: startRange,
+        end: "P0D",
+        period: 300,
+        stat: "Average",
+        yAxis: {
+          left: { label: "Percent", min: 0, max: 100 },
+        },
+        metrics: canaries.map((c) => [
+          "CloudWatchSynthetics",
+          "SuccessPercent",
+          "CanaryName",
+          c.name,
+          { label: c.label, color: c.color },
+        ]),
+      };
+    }
+
+    const cmd = new GetMetricWidgetImageCommand({
+      MetricWidget: JSON.stringify(widgetConfig),
+      OutputFormat: "png",
+    });
+
+    const resp = await cwClient.send(cmd);
+    if (!resp.MetricWidgetImage) {
+      return res.status(500).send("No image generated");
+    }
+
+    const imageBuffer = Buffer.from(resp.MetricWidgetImage);
+
+    // Cache base64 in Redis for 60s
+    await setCache(cacheKey, imageBuffer.toString("base64"), 60);
+
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "public, max-age=60");
+    return res.send(imageBuffer);
+  } catch (err) {
+    console.error("[HEALTH] Error generating metric chart:", err.message);
+    return res.status(500).send("Failed to render metric chart");
+  }
+};
+
 module.exports = {
   getHealthStatus,
+  getMetricChart,
 };
