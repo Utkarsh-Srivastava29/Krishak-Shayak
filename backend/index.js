@@ -12,6 +12,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const weatherRoutes = require("./routes/weatherRoutes");
 const marketPriceRoutes = require("./routes/marketPriceRoutes");
 const schemeRoutes = require("./routes/schemeRoutes");
+const healthRoutes = require("./routes/healthRoutes");
 const { connectRedis } = require("./config/redisClient");
 
 
@@ -77,6 +78,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/weather", weatherRoutes);
 app.use("/api/market-prices", marketPriceRoutes);
 app.use("/api/schemes", schemeRoutes);
+app.use("/api/health", healthRoutes);
 
 // Basic route for testing
 app.get("/", (req, res) => {
