@@ -276,22 +276,31 @@ Resources:
           echo "  API: http://$PUBLIC_IP/api"
           echo "========================================="
 
+  # Permanent Static IP (Elastic IP - stays unchanged forever)
+  AppElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref AppServer
+      Tags:
+        - Key: Name
+          Value: krishak-shayak-eip
+
 # ─────────────────────────────────────────────
 # OUTPUTS — Stack information
 # ─────────────────────────────────────────────
 Outputs:
   WebsiteURL:
     Description: 'Application URL (Open in browser)'
-    Value: !Sub 'http://${AppServer.PublicIp}'
+    Value: !Sub 'http://${AppElasticIP}'
 
   APIURL:
     Description: 'Backend API URL'
-    Value: !Sub 'http://${AppServer.PublicIp}/api'
+    Value: !Sub 'http://${AppElasticIP}/api'
 
   SSHCommand:
     Description: 'SSH command to connect to the EC2 server'
-    Value: !Sub 'ssh -i ${KeyPairName}.pem ubuntu@${AppServer.PublicIp}'
+    Value: !Sub 'ssh -i ${KeyPairName}.pem ubuntu@${AppElasticIP}'
 
   PublicIP:
-    Description: 'EC2 Public IP Address'
-    Value: !GetAtt AppServer.PublicIp
+    Description: 'EC2 Permanent Elastic IP Address'
+    Value: !Ref AppElasticIP
