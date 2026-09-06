@@ -28,25 +28,22 @@ Parameters:
     Type: String
     NoEcho: true
     Description: 'MongoDB Atlas connection string'
-    Default: 'mongodb+srv://lavishshakya066:lavishshakya@cluster0.rzc43hp.mongodb.net/krishak-shayak'
 
   JWTSecret:
     Type: String
     NoEcho: true
     Description: 'JWT secret key'
-    Default: 'your_jwt_secret_key_here'
+    Default: 'change_this_jwt_secret'
 
   OpenWeatherAPIKey:
     Type: String
     NoEcho: true
     Description: 'OpenWeatherMap API Key'
-    Default: '97a99a6978e3f046029de9c4a8a54795'
 
   DataGovAPIKey:
     Type: String
     NoEcho: true
     Description: 'Data.gov.in API Key'
-    Default: '579b464db66ec23bdd00000193b99a55112f47fa73efacc0606e14af'
 
   SchemesSheetURL:
     Type: String
@@ -215,7 +212,7 @@ Resources:
 
           sudo -u ubuntu cat > .env << FENVEOF
           VITE_API_URL=/api
-          VITE_RAZORPAY_KEY_ID=rzp_test_R6tg4pGRMJdWns
+          VITE_RAZORPAY_KEY_ID=rzp_test_placeholder
           VITE_WEATHER_API_KEY=${OpenWeatherAPIKey}
           VITE_WEATHER_BASE_URL=https://api.openweathermap.org
           VITE_NEWSDATA_API_KEY=pub_2f4c600e7310491fb5df044fc12ba621
