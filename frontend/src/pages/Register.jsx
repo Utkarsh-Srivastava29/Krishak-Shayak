@@ -77,17 +77,17 @@ const Register = () => {
   const getPasswordStrengthLabel = () => {
     switch (passwordStrength) {
       case 0:
-        return "Weak";
+        return t("register.strengthWeak");
       case 1:
-        return "Fair";
+        return t("register.strengthFair");
       case 2:
-        return "Good";
+        return t("register.strengthGood");
       case 3:
-        return "Strong";
+        return t("register.strengthStrong");
       case 4:
-        return "Very Strong";
+        return t("register.strengthVeryStrong");
       default:
-        return "Weak";
+        return t("register.strengthWeak");
     }
   };
 
@@ -112,29 +112,29 @@ const Register = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = t("register.nameRequired");
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t("register.emailRequired");
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = t("register.emailInvalid");
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = t("register.phoneRequired");
     } else if (!/^\d{10}$/.test(formData.phone.trim())) {
-      newErrors.phone = "Phone number must be 10 digits";
+      newErrors.phone = t("register.phone10Digits");
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = t("register.passwordRequired");
     } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = t("register.passwordMinLength");
     }
 
     if (formData.confirmPassword !== formData.password) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t("register.passwordMismatch");
     }
 
     setErrors(newErrors);
@@ -145,18 +145,18 @@ const Register = () => {
     const newErrors = {};
 
     if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
+      newErrors.address = t("register.addressRequired");
     }
 
     if (formData.userType === "seller") {
       if (!formData.shopName.trim()) {
-        newErrors.shopName = "Shop name is required for sellers";
+        newErrors.shopName = t("register.shopNameRequired");
       }
 
       if (!formData.aadharNumber.trim()) {
-        newErrors.aadharNumber = "Aadhar number is required for sellers";
+        newErrors.aadharNumber = t("register.aadharRequired");
       } else if (!/^\d{12}$/.test(formData.aadharNumber.trim())) {
-        newErrors.aadharNumber = "Aadhar number must be 12 digits";
+        newErrors.aadharNumber = t("register.aadharInvalid");
       }
     }
 
@@ -171,13 +171,17 @@ const Register = () => {
     }
   };
 
-  const prevStep = () => {
+  const prevStep = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setFormStep(1);
   };
 
   // Update your handleSubmit function with additional logging
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
     if (formStep === 1) {
       nextStep();
@@ -257,13 +261,13 @@ const Register = () => {
                 <MdCheckCircle className="h-10 w-10 text-green-600" />
               </div>
               <h2 className="mt-4 text-2xl font-bold text-gray-900">
-                Registration Successful!
+                {t("register.successTitle")}
               </h2>
               <p className="mt-2 text-gray-600">
-                Your account has been created successfully.
+                {t("register.successMessage")}
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                Redirecting to login page...
+                {t("register.redirecting")}
               </p>
             </div>
           </div>
@@ -278,20 +282,19 @@ const Register = () => {
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-green-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8 mt-16">
         {/* Decorative elements in the background */}
-        <div className="fixed top-20 right-20 w-64 h-64 bg-yellow-200 rounded-full opacity-20 blur-3xl -z-10"></div>
-        <div className="fixed bottom-20 left-20 w-96 h-96 bg-green-200 rounded-full opacity-20 blur-3xl -z-10"></div>
-        <div className="fixed top-40 left-40 w-32 h-32 bg-green-300 rounded-full opacity-10 blur-2xl -z-10"></div>
-        <div className="fixed bottom-40 right-32 w-48 h-48 bg-yellow-100 rounded-full opacity-15 blur-2xl -z-10"></div>
+        <div className="fixed top-20 right-20 w-64 h-64 bg-yellow-200 rounded-full opacity-20 blur-3xl -z-10 pointer-events-none"></div>
+        <div className="fixed bottom-20 left-20 w-96 h-96 bg-green-200 rounded-full opacity-20 blur-3xl -z-10 pointer-events-none"></div>
+        <div className="fixed top-40 left-40 w-32 h-32 bg-green-300 rounded-full opacity-10 blur-2xl -z-10 pointer-events-none"></div>
+        <div className="fixed bottom-40 right-32 w-48 h-48 bg-yellow-100 rounded-full opacity-15 blur-2xl -z-10 pointer-events-none"></div>
 
         {/* Your existing form and content remains the same */}
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-xl overflow-hidden transform transition-all">
           <div className="bg-gradient-to-r from-green-700 to-green-600 py-6 px-6">
             <h2 className="text-center text-2xl font-bold text-white">
-              Create your account
+              {t("register.title")}
             </h2>
             <p className="mt-2 text-center text-sm text-yellow-200">
-              Join Krishak Shayak to connect with farmers and access
-              agricultural resources
+              {t("register.subtitle")}
             </p>
           </div>
 
@@ -307,7 +310,7 @@ const Register = () => {
                   >
                     1
                   </div>
-                  <span className="text-xs mt-1 font-medium">Account</span>
+                  <span className="text-xs mt-1 font-medium">{t("register.stepAccount")}</span>
                 </div>
 
                 <div
@@ -324,7 +327,7 @@ const Register = () => {
                   >
                     2
                   </div>
-                  <span className="text-xs mt-1 font-medium">Details</span>
+                  <span className="text-xs mt-1 font-medium">{t("register.stepDetails")}</span>
                 </div>
               </div>
             </div>
@@ -338,7 +341,7 @@ const Register = () => {
                       htmlFor="name"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Full Name
+                      {t("register.nameLabel")}
                     </label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -357,7 +360,7 @@ const Register = () => {
                             ? "border-green-500"
                             : "border-gray-300"
                         } rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors`}
-                        placeholder="John Doe"
+                        placeholder={t("register.namePlaceholder")}
                       />
                       {errors.name ? (
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -380,7 +383,7 @@ const Register = () => {
                         htmlFor="email"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Email Address
+                        {t("register.emailLabel")}
                       </label>
                       <div className="mt-1 relative rounded-md shadow-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -399,7 +402,7 @@ const Register = () => {
                               ? "border-green-500"
                               : "border-gray-300"
                           } rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors`}
-                          placeholder="example@email.com"
+                          placeholder={t("register.emailPlaceholder")}
                         />
                         {errors.email ? (
                           <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -423,7 +426,7 @@ const Register = () => {
                         htmlFor="phone"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Phone Number
+                        {t("register.phoneLabel")}
                       </label>
                       <div className="mt-1 relative rounded-md shadow-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -442,7 +445,7 @@ const Register = () => {
                               ? "border-green-500"
                               : "border-gray-300"
                           } rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors`}
-                          placeholder="1234567890"
+                          placeholder={t("register.phonePlaceholder")}
                         />
                         {errors.phone ? (
                           <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -467,7 +470,7 @@ const Register = () => {
                       htmlFor="password"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Password
+                      {t("register.passwordLabel")}
                     </label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -509,7 +512,7 @@ const Register = () => {
                       <div className="mt-2">
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-xs text-gray-500">
-                            Password strength:
+                            {t("register.passwordStrength")}
                           </p>
                           <p
                             className={`text-xs font-medium ${
@@ -539,7 +542,7 @@ const Register = () => {
                                 : ""
                             }
                           >
-                            • 8+ characters
+                            • {t("register.rule8Chars")}
                           </p>
                           <p
                             className={
@@ -548,7 +551,7 @@ const Register = () => {
                                 : ""
                             }
                           >
-                            • One uppercase
+                            • {t("register.ruleUppercase")}
                           </p>
                           <p
                             className={
@@ -557,7 +560,7 @@ const Register = () => {
                                 : ""
                             }
                           >
-                            • One number
+                            • {t("register.ruleNumber")}
                           </p>
                           <p
                             className={
@@ -566,7 +569,7 @@ const Register = () => {
                                 : ""
                             }
                           >
-                            • One special character
+                            • {t("register.ruleSpecial")}
                           </p>
                         </div>
                       </div>
@@ -578,7 +581,7 @@ const Register = () => {
                       htmlFor="confirmPassword"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Confirm Password
+                      {t("register.confirmPasswordLabel")}
                     </label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -628,7 +631,7 @@ const Register = () => {
                       htmlFor="userType"
                       className="block text-sm font-medium text-gray-700 mb-3"
                     >
-                      I am a:
+                      {t("register.iAmA")}
                     </label>
                     <div className="grid grid-cols-2 gap-4">
                       <div
@@ -646,9 +649,9 @@ const Register = () => {
                         <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-green-100 mb-3 transform transition hover:scale-110">
                           <FaSeedling className="h-8 w-8 text-green-600" />
                         </div>
-                        <div className="font-medium text-lg mb-1">Seller</div>
+                        <div className="font-medium text-lg mb-1">{t("register.seller")}</div>
                         <p className="text-sm text-gray-500">
-                          Sell your produce directly to buyers
+                          {t("register.sellerDesc")}
                         </p>
                       </div>
 
@@ -667,9 +670,9 @@ const Register = () => {
                         <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-green-100 mb-3 transform transition hover:scale-110">
                           <FaShoppingBasket className="h-8 w-8 text-green-600" />
                         </div>
-                        <div className="font-medium text-lg mb-1">Buyer</div>
+                        <div className="font-medium text-lg mb-1">{t("register.buyer")}</div>
                         <p className="text-sm text-gray-500">
-                          Purchase fresh produce directly from sellers
+                          {t("register.buyerDesc")}
                         </p>
                       </div>
                     </div>
@@ -680,7 +683,7 @@ const Register = () => {
                       htmlFor="address"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Address
+                      {t("register.addressLabel")}
                     </label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute top-3 left-3 flex items-start pointer-events-none">
@@ -699,7 +702,7 @@ const Register = () => {
                             ? "border-green-500"
                             : "border-gray-300"
                         } rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors`}
-                        placeholder="Enter your full address"
+                        placeholder={t("register.addressPlaceholder")}
                       ></textarea>
                       {errors.address ? (
                         <div className="absolute top-2 right-3">
@@ -725,7 +728,7 @@ const Register = () => {
                           htmlFor="shopName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Shop Name *
+                          {t("register.shopNameLabel")}
                         </label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -744,7 +747,7 @@ const Register = () => {
                                 ? "border-green-500"
                                 : "border-gray-300"
                             } rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition-colors`}
-                            placeholder="Enter your shop name"
+                            placeholder={t("register.shopNamePlaceholder")}
                           />
                           {errors.shopName ? (
                             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -762,8 +765,7 @@ const Register = () => {
                           </p>
                         )}
                         <p className="mt-1 text-xs text-gray-500">
-                          This will be displayed as your shop name in the
-                          marketplace.
+                          {t("register.shopNameHint")}
                         </p>
                       </div>
 
@@ -772,7 +774,7 @@ const Register = () => {
                           htmlFor="aadharNumber"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Aadhar Number *
+                          {t("register.aadharLabel")}
                         </label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -810,8 +812,7 @@ const Register = () => {
                           </p>
                         )}
                         <p className="mt-1 text-xs text-gray-500">
-                          We need your Aadhar number to verify your identity as
-                          a seller.
+                          {t("register.aadharHint")}
                         </p>
                       </div>
                     </>
@@ -824,6 +825,7 @@ const Register = () => {
                   )}
                 </div>
               )}
+            </form>
 
               <div className="flex items-center justify-between pt-4">
                 {formStep === 2 ? (
@@ -847,10 +849,11 @@ const Register = () => {
                           d="M15 19l-7-7 7-7"
                         />
                       </svg>
-                      Back
+                      {t("register.back")}
                     </button>
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={handleSubmit}
                       disabled={isSubmitting}
                       className="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-75 disabled:cursor-not-allowed"
                     >
@@ -876,11 +879,11 @@ const Register = () => {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
                           </svg>
-                          Processing...
+                          {t("register.processing")}
                         </>
                       ) : (
                         <>
-                          Register
+                          {t("register.register")}
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 ml-1"
@@ -901,7 +904,8 @@ const Register = () => {
                   </>
                 ) : (
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleSubmit}
                     disabled={isSubmitting}
                     className="w-full inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-75 disabled:cursor-not-allowed"
                   >
@@ -927,11 +931,11 @@ const Register = () => {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        Processing...
+                        {t("register.processing")}
                       </>
                     ) : (
                       <>
-                        Continue
+                        {t("register.continue")}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-5 w-5 ml-1"
@@ -951,16 +955,15 @@ const Register = () => {
                   </button>
                 )}
               </div>
-            </form>
 
             <div className="mt-8 border-t border-gray-200 pt-6">
               <p className="text-center text-sm text-gray-600 mb-6">
-                Already have an account?{" "}
+                {t("register.alreadyHaveAccount")}{" "}
                 <Link
                   to="/login"
                   className="font-medium text-green-600 hover:text-green-500 transition-colors"
                 >
-                  Login here
+                  {t("register.loginHere")}
                 </Link>
               </p>
 
@@ -971,7 +974,7 @@ const Register = () => {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white text-gray-500">
-                    Or register with
+                    {t("register.orRegisterWith")}
                   </span>
                 </div>
               </div>

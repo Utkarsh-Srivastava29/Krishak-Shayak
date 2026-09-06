@@ -201,6 +201,13 @@ const ShoppingCart = () => {
       theme: {
         color: "#16a34a", // Green color matching your theme
       },
+      method: {
+        upi: true,
+        card: true,
+        netbanking: true,
+        wallet: true,
+        paylater: true,
+      },
       modal: {
         ondismiss: function () {
           setIsProcessing(false);

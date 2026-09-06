@@ -62,10 +62,10 @@ const Weather = () => {
     fetchWeather();
   }, []);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const fetchWeatherForCity = async (targetLocation) => {
+    const locToSearch = targetLocation !== undefined ? targetLocation : location;
 
-    if (!location.trim()) {
+    if (!locToSearch || !locToSearch.trim()) {
       setError("Please enter a location");
       return;
     }
@@ -75,15 +75,15 @@ const Weather = () => {
 
     try {
       // Try with original input
-      const data = await getWeatherData(location);
+      const data = await getWeatherData(locToSearch);
       setWeatherData(data);
 
       // Fetch hourly forecast data for the new location
-      const hourlyForecastData = await getHourlyForecast(location);
+      const hourlyForecastData = await getHourlyForecast(locToSearch);
       setHourlyData(hourlyForecastData);
 
       // Fetch extended forecast data for the new location
-      const extendedForecastData = await getExtendedForecast(location);
+      const extendedForecastData = await getExtendedForecast(locToSearch);
       setExtendedForecast(extendedForecastData);
 
       // Generate agricultural tips based on new weather data
@@ -97,11 +97,16 @@ const Weather = () => {
       console.error("Failed to fetch weather data:", err);
       // More helpful error message
       setError(
-        `Weather data not found for "${location}". Try adding a country code (e.g., "Delhi, IN" for Delhi, India).`
+        `Weather data not found for "${locToSearch}". Try adding a country code (e.g., "Delhi, IN" for Delhi, India).`
       );
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSearch = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    await fetchWeatherForCity();
   };
 
   // Add these functions to predict soil moisture
@@ -232,8 +237,7 @@ const Weather = () => {
                     onClick={() => {
                       setLocation(suggestion);
                       setShowSuggestions(false);
-                      const mockEvent = { preventDefault: () => { } };
-                      handleSearch(mockEvent);
+                      fetchWeatherForCity(suggestion);
                     }}
                   >
                     {suggestion}
@@ -261,8 +265,7 @@ const Weather = () => {
                 key={city}
                 onClick={() => {
                   setLocation(city);
-                  const mockEvent = { preventDefault: () => { } };
-                  handleSearch(mockEvent);
+                  fetchWeatherForCity(city);
                 }}
                 className="text-sm bg-white border border-gray-300 rounded-full px-3 py-1 hover:bg-green-50 hover:border-green-400 transition"
               >
