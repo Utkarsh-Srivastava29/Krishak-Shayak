@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { API_URL } from "../services/api";
@@ -16,9 +17,27 @@ import {
   FaExternalLinkAlt,
   FaShieldAlt,
   FaMemory,
+  FaLock,
+  FaKey,
 } from "react-icons/fa";
 
 const Health = () => {
+  // Developer authentication state
+  const [devKey, setDevKey] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramKey = urlParams.get("key");
+    if (paramKey) {
+      sessionStorage.setItem("ks_dev_key", paramKey);
+      return paramKey;
+    }
+    return sessionStorage.getItem("ks_dev_key") || "";
+  });
+
+  const [inputKey, setInputKey] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [showKeyPrompt, setShowKeyPrompt] = useState(false);
+  const [authError, setAuthError] = useState("");
+
   const [healthData, setHealthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,40 +47,86 @@ const Health = () => {
   const [chartType, setChartType] = useState("uptime");
   const [chartHours, setChartHours] = useState(3);
 
-  const fetchHealth = useCallback(async (isManual = false) => {
-    if (isManual) setIsRefreshing(true);
-    try {
-      // Direct fetch to health endpoint
-      const response = await fetch(`${API_URL}/health`);
-      if (!response.ok) {
-        throw new Error(`Health check returned status ${response.status}`);
+  const fetchHealth = useCallback(
+    async (keyToUse, isManual = false) => {
+      if (!keyToUse) {
+        setLoading(false);
+        setIsAuthorized(false);
+        return;
       }
-      const data = await response.json();
-      setHealthData(data);
-      setError(null);
-      setLastRefreshed(new Date());
-    } catch (err) {
-      console.error("Failed to fetch health status:", err);
-      setError(err.message || "Failed to connect to health endpoint");
-    } finally {
-      setLoading(false);
-      if (isManual) setIsRefreshing(false);
-    }
-  }, []);
 
-  // Initial fetch
+      if (isManual) setIsRefreshing(true);
+      try {
+        const response = await fetch(
+          `${API_URL}/health?key=${encodeURIComponent(keyToUse)}`
+        );
+        if (response.status === 404 || response.status === 401 || response.status === 403) {
+          setIsAuthorized(false);
+          sessionStorage.removeItem("ks_dev_key");
+          setAuthError("Invalid developer passkey");
+          setHealthData(null);
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Health check returned status ${response.status}`);
+        }
+
+        const data = await response.json();
+        setHealthData(data);
+        setIsAuthorized(true);
+        setError(null);
+        setAuthError("");
+        setLastRefreshed(new Date());
+      } catch (err) {
+        console.error("Failed to fetch health status:", err);
+        setError(err.message || "Failed to connect to health endpoint");
+      } finally {
+        setLoading(false);
+        if (isManual) setIsRefreshing(false);
+      }
+    },
+    []
+  );
+
+  // Initial fetch with devKey
   useEffect(() => {
-    fetchHealth();
-  }, [fetchHealth]);
+    if (devKey) {
+      fetchHealth(devKey);
+    } else {
+      setLoading(false);
+      setIsAuthorized(false);
+    }
+  }, [devKey, fetchHealth]);
 
   // Auto-refresh interval (every 30 seconds)
   useEffect(() => {
-    if (!autoRefresh) return;
+    if (!autoRefresh || !isAuthorized || !devKey) return;
     const timer = setInterval(() => {
-      fetchHealth();
+      fetchHealth(devKey);
     }, 30000);
     return () => clearInterval(timer);
-  }, [autoRefresh, fetchHealth]);
+  }, [autoRefresh, isAuthorized, devKey, fetchHealth]);
+
+  const handleKeySubmit = (e) => {
+    e.preventDefault();
+    if (!inputKey.trim()) return;
+    setLoading(true);
+    setAuthError("");
+    sessionStorage.setItem("ks_dev_key", inputKey.trim());
+    setDevKey(inputKey.trim());
+    fetchHealth(inputKey.trim());
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("ks_dev_key");
+    setDevKey("");
+    setIsAuthorized(false);
+    setHealthData(null);
+    setShowKeyPrompt(false);
+    // Remove ?key= from URL if present
+    window.history.replaceState({}, document.title, window.location.pathname);
+  };
 
   // Service icon mapping
   const getServiceIcon = (id) => {
@@ -123,6 +188,94 @@ const Health = () => {
 
   const isAllOperational = healthData && healthData.overallStatus === "operational";
 
+  // ─────────────────────────────────────────────
+  // UNAUTHORIZED / 404 SCREEN FOR REGULAR USERS
+  // ─────────────────────────────────────────────
+  if (!loading && !isAuthorized) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+        <Navbar />
+
+        <main className="flex-grow flex items-center justify-center px-4 py-16">
+          <div className="max-w-md w-full text-center">
+            <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-slate-100 text-slate-400 mb-6 border border-slate-200">
+              <FaLock className="text-2xl" />
+            </div>
+            <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight">404</h1>
+            <h2 className="text-lg font-bold text-slate-700 mt-2">Page Not Found</h2>
+            <p className="text-sm text-slate-500 mt-2">
+              The page you are looking for doesn't exist or you do not have permission to view it.
+            </p>
+
+            <div className="mt-8 flex justify-center gap-3">
+              <Link
+                to="/"
+                className="px-5 py-2.5 text-xs font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-sm"
+              >
+                Back to Home
+              </Link>
+            </div>
+
+            {/* Discrete Developer Passphrase Unlock */}
+            <div className="mt-16 pt-8 border-t border-slate-200/70">
+              {!showKeyPrompt ? (
+                <button
+                  onClick={() => setShowKeyPrompt(true)}
+                  className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <FaKey className="text-[10px]" />
+                  Developer Access
+                </button>
+              ) : (
+                <form
+                  onSubmit={handleKeySubmit}
+                  className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-fade-in"
+                >
+                  <div className="text-xs font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                    <span>Developer Passkey</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowKeyPrompt(false)}
+                      className="text-slate-400 hover:text-slate-600 text-[11px]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="password"
+                      placeholder="Enter passkey..."
+                      value={inputKey}
+                      onChange={(e) => setInputKey(e.target.value)}
+                      className="flex-grow px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
+                    >
+                      Unlock
+                    </button>
+                  </div>
+                  {authError && (
+                    <p className="text-[11px] text-rose-600 text-left mt-1.5 font-medium">
+                      {authError}
+                    </p>
+                  )}
+                </form>
+              )}
+            </div>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  // AUTHORIZED DEVELOPER TELEMETRY DASHBOARD
+  // ─────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Navbar />
@@ -133,11 +286,11 @@ const Health = () => {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                System Status
+                Developer Telemetry
               </h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-300">
-                <FaShieldAlt className="text-slate-500" />
-                Live Telemetry
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-800 border border-amber-300">
+                <FaLock className="text-[10px]" />
+                Protected Dev Mode
               </span>
             </div>
             <p className="text-slate-500 text-sm mt-1">
@@ -145,7 +298,7 @@ const Health = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm hover:border-slate-300">
               <input
                 type="checkbox"
@@ -157,12 +310,19 @@ const Health = () => {
             </label>
 
             <button
-              onClick={() => fetchHealth(true)}
+              onClick={() => fetchHealth(devKey, true)}
               disabled={isRefreshing}
               className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 shadow-sm transition-all disabled:opacity-50"
             >
               <FaSyncAlt className={isRefreshing ? "animate-spin" : ""} />
               Refresh
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              Lock View
             </button>
           </div>
         </div>
@@ -372,7 +532,7 @@ const Health = () => {
           <div className="mt-6 flex justify-center items-center rounded-xl bg-slate-50/70 p-3 border border-slate-100 min-h-[340px]">
             <img
               key={`${chartType}-${chartHours}-${lastRefreshed?.getTime()}`}
-              src={`${API_URL}/health/chart?type=${chartType}&hours=${chartHours}&t=${lastRefreshed ? lastRefreshed.getTime() : Date.now()}`}
+              src={`${API_URL}/health/chart?type=${chartType}&hours=${chartHours}&key=${encodeURIComponent(devKey)}&t=${lastRefreshed ? lastRefreshed.getTime() : Date.now()}`}
               alt="AWS CloudWatch Metrics Graph"
               className="max-w-full h-auto rounded-lg shadow-2xs"
               loading="lazy"
