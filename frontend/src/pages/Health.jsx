@@ -22,15 +22,10 @@ import {
 } from "react-icons/fa";
 
 const Health = () => {
-  // Developer authentication state
+  // Developer authentication state — strictly requires ?key=... in the URL
   const [devKey, setDevKey] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const paramKey = urlParams.get("key");
-    if (paramKey) {
-      sessionStorage.setItem("ks_dev_key", paramKey);
-      return paramKey;
-    }
-    return sessionStorage.getItem("ks_dev_key") || "";
+    return urlParams.get("key") || "";
   });
 
   const [inputKey, setInputKey] = useState("");
@@ -113,18 +108,17 @@ const Health = () => {
     if (!inputKey.trim()) return;
     setLoading(true);
     setAuthError("");
-    sessionStorage.setItem("ks_dev_key", inputKey.trim());
-    setDevKey(inputKey.trim());
-    fetchHealth(inputKey.trim());
+    const key = inputKey.trim();
+    setDevKey(key);
+    window.history.replaceState({}, document.title, `?key=${encodeURIComponent(key)}`);
+    fetchHealth(key);
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("ks_dev_key");
     setDevKey("");
     setIsAuthorized(false);
     setHealthData(null);
     setShowKeyPrompt(false);
-    // Remove ?key= from URL if present
     window.history.replaceState({}, document.title, window.location.pathname);
   };
 
