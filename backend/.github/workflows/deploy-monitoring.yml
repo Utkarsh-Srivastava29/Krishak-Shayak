@@ -6,7 +6,7 @@ on:
       alert_email:
         description: 'Email to receive downtime alerts'
         required: true
-        default: 'lavishshakya066@gmail.com'
+        default: 'lavishshakyaprep@gmail.com'
       domain_name:
         description: 'Domain name to monitor'
         required: true
