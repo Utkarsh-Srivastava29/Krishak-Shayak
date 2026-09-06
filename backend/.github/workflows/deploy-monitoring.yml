@@ -1,0 +1,49 @@
+name: Deploy Monitoring Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      alert_email:
+        description: 'Email to receive downtime alerts'
+        required: true
+        default: 'lavishshakya066@gmail.com'
+      domain_name:
+        description: 'Domain name to monitor'
+        required: true
+        default: 'krishakshayak.duckdns.org'
+      aws_region:
+        description: 'AWS Region'
+        required: true
+        default: 'ap-south-1'
+
+jobs:
+  deploy-monitoring:
+    name: Deploy CDK Monitoring Stack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        working-directory: infra/monitoring
+        run: npm install
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.aws_region || 'ap-south-1' }}
+
+      - name: Bootstrap CDK
+        working-directory: infra/monitoring
+        run: npx cdk bootstrap
+
+      - name: Deploy Monitoring Stack
+        working-directory: infra/monitoring
+        run: npx cdk deploy --require-approval never

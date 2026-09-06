@@ -1,0 +1,26 @@
+{
+  "name": "krishak-shayak-monitoring",
+  "version": "1.0.0",
+  "description": "CloudWatch Monitoring Stack for Krishak Shayak using cdk-monitoring-constructs",
+  "bin": {
+    "monitoring-app": "bin/monitoring-app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.170.0",
+    "cdk-monitoring-constructs": "^9.0.0",
+    "constructs": "^10.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "aws-cdk": "^2.170.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
