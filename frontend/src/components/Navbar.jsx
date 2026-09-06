@@ -32,7 +32,7 @@ const Navbar = () => {
   useEffect(() => {
     // Check if user is authenticated
     const checkAuthStatus = () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const currentUser = authService.getCurrentUser();
 
       if (token && currentUser) {

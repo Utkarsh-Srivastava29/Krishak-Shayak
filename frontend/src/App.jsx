@@ -9,6 +9,9 @@ import MarketPrice from "./pages/MarketPrice";
 import Weather from "./pages/Weather";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import GoogleCallback from "./pages/GoogleCallback";
 import SellerDashboard from "./pages/SellerDashboard";
 import FarmerDashboard from "./pages/FarmerDashboard";
 import ShoppingCart from "./pages/ShoppingCart";
@@ -23,11 +26,11 @@ import "./index.css";
 function App() {
   // For debugging purposes, log if we have a token
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (token) {
-      console.log("Token found in localStorage");
+      console.log("Token found in storage");
     } else {
-      console.log("No token found in localStorage");
+      console.log("No token found in storage");
     }
   }, []);
 
@@ -127,8 +130,6 @@ function App() {
           }
         />
 
-        <Route path="/cart" element={<ShoppingCart />} />
-
         {/* Public routes */}
         <Route path="/crop-recommendation" element={<CropGuide />} />
         <Route path="/market-price" element={<MarketPrice />} />
@@ -137,6 +138,9 @@ function App() {
         <Route path="/health" element={<Health />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
         {/* Fallback route */}
         <Route path="*" element={<Home />} />

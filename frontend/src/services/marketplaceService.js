@@ -1,8 +1,8 @@
 // API Configuration
-import { API_URL } from "./api";
+import { API_URL, getToken } from "./api";
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   return {
     "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -679,7 +679,7 @@ export const fetchProducts = async (filters) => {
 // Placeholder service functions for seller dashboard
 export const getSellerProducts = async () => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await fetch(`${API_URL}/products/my-products`, {
       headers: {
@@ -702,7 +702,7 @@ export const getSellerProducts = async () => {
 
 export const deleteProduct = async (productId) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await fetch(`${API_URL}/products/${productId}`, {
       method: "DELETE",
@@ -727,7 +727,7 @@ export const deleteProduct = async (productId) => {
 // Add this function to your existing marketplaceService.js
 export const addProduct = async (productData) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     // Map frontend field names to backend field names
     const mappedData = {
@@ -764,7 +764,7 @@ export const addProduct = async (productData) => {
 // Update product function
 export const updateProduct = async (productId, productData) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     // Map frontend field names to backend field names
     const mappedData = {
@@ -801,7 +801,7 @@ export const updateProduct = async (productId, productData) => {
 // Seller profile functions
 export const getSellerProfile = async () => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await fetch(`${API_URL}/seller/profile`, {
       headers: {
@@ -823,7 +823,7 @@ export const getSellerProfile = async () => {
 
 export const updateSellerProfile = async (profileData) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await fetch(`${API_URL}/seller/profile`, {
       method: "PUT",
