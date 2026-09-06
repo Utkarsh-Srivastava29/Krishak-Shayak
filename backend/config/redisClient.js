@@ -53,11 +53,26 @@ const connectRedis = async () => {
     isConnected = false;
   });
 
-  redisClient.on("end", () => {
-    isConnected = false;
-  });
+  return new Promise((resolve) => {
+    if (redisClient.status === "ready") {
+      isConnected = true;
+      return resolve(redisClient);
+    }
 
-  return redisClient;
+    const timeout = setTimeout(() => {
+      resolve(redisClient);
+    }, 2000);
+
+    redisClient.once("ready", () => {
+      clearTimeout(timeout);
+      resolve(redisClient);
+    });
+
+    redisClient.once("error", () => {
+      clearTimeout(timeout);
+      resolve(redisClient);
+    });
+  });
 };
 
 /**
@@ -188,6 +203,7 @@ process.on("SIGTERM", async () => {
 
 module.exports = {
   connectRedis,
+  disconnectRedis,
   getRedisClient,
   getRawRedisClient,
   isRedisReady,
