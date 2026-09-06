@@ -25,6 +25,8 @@ const Health = () => {
   const [lastRefreshed, setLastRefreshed] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [chartType, setChartType] = useState("uptime");
+  const [chartHours, setChartHours] = useState(3);
 
   const fetchHealth = useCallback(async (isManual = false) => {
     if (isManual) setIsRefreshing(true);
@@ -294,6 +296,89 @@ const Health = () => {
             </div>
           </div>
         )}
+
+        {/* Live CloudWatch Visual Metric Graphs */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 text-base">
+                  Live CloudWatch Telemetry Graphs
+                </h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Direct AWS CloudWatch
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Real-time metrics rendered directly by Amazon CloudWatch Synthetics in ap-south-1
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Type selector */}
+              <div className="inline-flex rounded-lg bg-slate-100 p-1">
+                <button
+                  onClick={() => setChartType("uptime")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                    chartType === "uptime"
+                      ? "bg-white text-emerald-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Success %
+                </button>
+                <button
+                  onClick={() => setChartType("latency")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                    chartType === "latency"
+                      ? "bg-white text-blue-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Latency (ms)
+                </button>
+                <button
+                  onClick={() => setChartType("errors")}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                    chartType === "errors"
+                      ? "bg-white text-rose-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Errors
+                </button>
+              </div>
+
+              {/* Hours selector */}
+              <div className="inline-flex rounded-lg bg-slate-100 p-1">
+                {[3, 12, 24].map((h) => (
+                  <button
+                    key={h}
+                    onClick={() => setChartHours(h)}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                      chartHours === h
+                        ? "bg-slate-800 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {h}h
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Image Container */}
+          <div className="mt-6 flex justify-center items-center rounded-xl bg-slate-50/70 p-3 border border-slate-100 min-h-[340px]">
+            <img
+              key={`${chartType}-${chartHours}-${lastRefreshed?.getTime()}`}
+              src={`${API_URL}/health/chart?type=${chartType}&hours=${chartHours}&t=${lastRefreshed ? lastRefreshed.getTime() : Date.now()}`}
+              alt="AWS CloudWatch Metrics Graph"
+              className="max-w-full h-auto rounded-lg shadow-2xs"
+              loading="lazy"
+            />
+          </div>
+        </div>
 
         {/* Services List Table */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-12">
