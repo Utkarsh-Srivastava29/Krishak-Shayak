@@ -56,6 +56,12 @@ const Footer = () => {
               <li><Link to="/market-price" className="text-gray-400 hover:text-white">{t('footer.marketPrice')}</Link></li>
               <li><Link to="/govt-schemes" className="text-gray-400 hover:text-white">{t('footer.govtSchemes')}</Link></li>
               <li><Link to="/weather" className="text-gray-400 hover:text-white">{t('footer.weather')}</Link></li>
+              <li>
+                <Link to="/health" className="text-gray-400 hover:text-white flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  System Status
+                </Link>
+              </li>
             </ul>
           </div>
 
