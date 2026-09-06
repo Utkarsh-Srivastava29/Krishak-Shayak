@@ -2,19 +2,23 @@
   "name": "krishak-shayak-server",
   "version": "1.0.0",
   "description": "Backend server for Krishak Shayak application",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "axios": "^1.20.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.3"
+    "mongoose": "^7.0.3",
+    "papaparse": "^5.7.0",
+    "redis": "^6.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

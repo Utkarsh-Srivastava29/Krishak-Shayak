@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 const User = require("../models/User");
 const mongoose = require("mongoose");
+const { getCache, setCache, delCache, delCacheByPattern } = require("../config/redisClient");
 
 // Helper function to validate ObjectId
 const isValidObjectId = (id) => {
@@ -37,6 +38,9 @@ exports.createProduct = async (req, res) => {
 
     await product.save();
 
+    // Invalidate product list caches
+    await delCacheByPattern("products:all:*");
+
     res.status(201).json({ message: "Product created successfully", product });
   } catch (error) {
     console.error("Create product error:", error);
@@ -50,6 +54,17 @@ exports.createProduct = async (req, res) => {
 exports.getAllProducts = async (req, res) => {
   try {
     const { category, minPrice, maxPrice, search, sort } = req.query;
+
+    // Build cache key from query params
+    const cacheKey = `products:all:${JSON.stringify(req.query)}`;
+
+    // Check cache first
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      console.log(`[REDIS CACHE HIT] ✅ Key: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
+    console.log(`[REDIS CACHE MISS] ❌ Key: "${cacheKey}"`);
 
     let query = { isActive: true };
 
@@ -92,6 +107,10 @@ exports.getAllProducts = async (req, res) => {
       .sort(sortOption)
       .populate("seller", "shopName name");
 
+    // Store in cache (TTL: 5 minutes)
+    await setCache(cacheKey, products, 300);
+    console.log(`[REDIS CACHE SET] 💾 Key: "${cacheKey}" | TTL: 300s`);
+
     res.json(products);
   } catch (error) {
     console.error("Get all products error:", error);
@@ -108,6 +127,15 @@ exports.getProductById = async (req, res) => {
       return res.status(400).json({ message: "Invalid product ID" });
     }
 
+    // Check cache first
+    const cacheKey = `product:${req.params.id}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      console.log(`[REDIS CACHE HIT] ✅ Key: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
+    console.log(`[REDIS CACHE MISS] ❌ Key: "${cacheKey}"`);
+
     const product = await Product.findById(req.params.id).populate(
       "seller",
       "shopName name location phone email rating reviewsCount"
@@ -116,6 +144,10 @@ exports.getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+
+    // Store in cache (TTL: 10 minutes)
+    await setCache(cacheKey, product, 600);
+    console.log(`[REDIS CACHE SET] 💾 Key: "${cacheKey}" | TTL: 600s`);
 
     res.json(product);
   } catch (error) {
@@ -216,6 +248,10 @@ exports.updateProduct = async (req, res) => {
 
     await product.save();
 
+    // Invalidate caches for this product and all product lists
+    await delCache(`product:${req.params.id}`);
+    await delCacheByPattern("products:all:*");
+
     res.json({ message: "Product updated successfully", product });
   } catch (error) {
     console.error("Update product error:", error);
@@ -246,6 +282,10 @@ exports.deleteProduct = async (req, res) => {
     }
 
     await Product.findByIdAndDelete(req.params.id);
+
+    // Invalidate caches for this product and all product lists
+    await delCache(`product:${req.params.id}`);
+    await delCacheByPattern("products:all:*");
 
     res.json({ message: "Product deleted successfully" });
   } catch (error) {

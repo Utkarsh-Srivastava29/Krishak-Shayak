@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
+const { getCache, setCache, delCache, delCacheByPattern } = require("../config/redisClient");
 
 // Helper function to validate ObjectId
 const isValidObjectId = (id) => {
@@ -50,6 +51,10 @@ exports.updateSellerProfile = async (req, res) => {
 
     await seller.save();
 
+    // Invalidate shop caches
+    await delCache(`shop:${req.user._id}`);
+    await delCache("shops:all");
+
     const updatedSeller = await User.findById(req.user._id).select("-password");
     res.json({
       message: "Profile updated successfully",
@@ -66,6 +71,15 @@ exports.updateSellerProfile = async (req, res) => {
 // @access  Public
 exports.getAllShops = async (req, res) => {
   try {
+    // Check cache first
+    const cacheKey = "shops:all";
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      console.log(`[REDIS CACHE HIT] \u2705 Key: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
+    console.log(`[REDIS CACHE MISS] \u274c Key: "${cacheKey}"`);
+
     const sellers = await User.find({ userType: "seller" }).select(
       "-password -aadharNumber"
     );
@@ -108,6 +122,10 @@ exports.getAllShops = async (req, res) => {
       })
     );
 
+    // Store in cache (TTL: 10 minutes)
+    await setCache(cacheKey, shopsWithProductCount, 600);
+    console.log(`[REDIS CACHE SET] \ud83d\udcbe Key: "${cacheKey}" | TTL: 600s`);
+
     res.json(shopsWithProductCount);
   } catch (error) {
     console.error("Get all shops error:", error);
@@ -123,6 +141,15 @@ exports.getShopById = async (req, res) => {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ message: "Invalid shop ID" });
     }
+
+    // Check cache first
+    const cacheKey = `shop:${req.params.id}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      console.log(`[REDIS CACHE HIT] \u2705 Key: "${cacheKey}"`);
+      return res.json(cachedData);
+    }
+    console.log(`[REDIS CACHE MISS] \u274c Key: "${cacheKey}"`);
 
     const seller = await User.findById(req.params.id).select(
       "-password -aadharNumber"
@@ -161,6 +188,10 @@ exports.getShopById = async (req, res) => {
         email: seller.email,
       },
     };
+
+    // Store in cache (TTL: 10 minutes)
+    await setCache(cacheKey, shop, 600);
+    console.log(`[REDIS CACHE SET] \ud83d\udcbe Key: "${cacheKey}" | TTL: 600s`);
 
     res.json(shop);
   } catch (error) {
