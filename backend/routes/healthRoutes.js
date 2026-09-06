@@ -6,14 +6,12 @@ const DEV_HEALTH_KEY = process.env.DEV_HEALTH_KEY || "ks-dev-admin-2026";
 
 /**
  * Developer Passkey Middleware
- * Only enforces passkey if DEV_HEALTH_KEY is configured in .env.
+ * Checks ?key=... or x-dev-key header. Returns 404 if invalid so endpoint is completely hidden.
  */
 const verifyDevKey = (req, res, next) => {
-  if (process.env.DEV_HEALTH_KEY) {
-    const providedKey = req.query.key || req.headers["x-dev-key"];
-    if (!providedKey || providedKey !== process.env.DEV_HEALTH_KEY) {
-      return res.status(404).json({ message: "Cannot GET " + req.originalUrl });
-    }
+  const providedKey = req.query.key || req.headers["x-dev-key"];
+  if (!providedKey || providedKey !== DEV_HEALTH_KEY) {
+    return res.status(404).json({ message: "Cannot GET " + req.originalUrl });
   }
   next();
 };
