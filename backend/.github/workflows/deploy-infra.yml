@@ -1,0 +1,71 @@
+name: Deploy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      key_pair_name:
+        description: 'Existing EC2 KeyPair Name in AWS'
+        required: true
+        default: 'krishak-key'
+      aws_region:
+        description: 'AWS Region to deploy into'
+        required: true
+        default: 'ap-south-1'
+
+env:
+  STACK_NAME: krishak-shayak
+
+jobs:
+  deploy-infra:
+    name: Deploy CloudFormation Stack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.aws_region || 'ap-south-1' }}
+
+      - name: Deploy CloudFormation Stack
+        run: |
+          KEY_NAME="${{ secrets.EC2_KEY_PAIR_NAME || github.event.inputs.key_pair_name }}"
+          echo "Using KeyPairName: $KEY_NAME"
+
+          PARAMS=("KeyPairName=$KEY_NAME")
+
+          if [ -n "${{ secrets.MONGODB_URI }}" ]; then
+            PARAMS+=("MongoDBURI=${{ secrets.MONGODB_URI }}")
+          fi
+          if [ -n "${{ secrets.JWT_SECRET }}" ]; then
+            PARAMS+=("JWTSecret=${{ secrets.JWT_SECRET }}")
+          fi
+          if [ -n "${{ secrets.OPENWEATHER_API_KEY }}" ]; then
+            PARAMS+=("OpenWeatherAPIKey=${{ secrets.OPENWEATHER_API_KEY }}")
+          fi
+          if [ -n "${{ secrets.DATA_GOV_API_KEY }}" ]; then
+            PARAMS+=("DataGovAPIKey=${{ secrets.DATA_GOV_API_KEY }}")
+          fi
+          if [ -n "${{ secrets.SCHEMES_SHEET_URL }}" ]; then
+            PARAMS+=("SchemesSheetURL=${{ secrets.SCHEMES_SHEET_URL }}")
+          fi
+
+          echo "Deploying CloudFormation stack: ${{ env.STACK_NAME }}..."
+          aws cloudformation deploy \
+            --template-file infra/cloudformation.yaml \
+            --stack-name ${{ env.STACK_NAME }} \
+            --parameter-overrides "${PARAMS[@]}" \
+            --no-fail-on-empty-changeset
+
+      - name: Display Stack Outputs
+        run: |
+          echo "========================================="
+          echo "        DEPLOYED STACK OUTPUTS           "
+          echo "========================================="
+          aws cloudformation describe-stacks \
+            --stack-name ${{ env.STACK_NAME }} \
+            --query "Stacks[0].Outputs" \
+            --output table

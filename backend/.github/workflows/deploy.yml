@@ -1,0 +1,33 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Backend to EC2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "========================================="
+            echo ">>> Pulling latest backend code..."
+            echo "========================================="
+            cd /home/ubuntu/Krishak_Shayak_Backend
+            git fetch origin main
+            git reset --hard origin/main
+            npm install --production=false
+
+            echo ">>> Restarting backend process with PM2..."
+            pm2 restart krishak-backend || pm2 start index.js --name "krishak-backend"
+            pm2 save
+
+            echo ">>> Backend deployed successfully!"
+            pm2 status

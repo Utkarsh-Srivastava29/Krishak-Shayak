@@ -37,6 +37,7 @@ app.use(
       // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin) return callback(null, true);
       if (
+        process.env.FRONTEND_URL === "*" ||
         allowedOrigins.indexOf(origin) !== -1 ||
         allowedOrigins.includes(undefined)
       ) {

@@ -1,0 +1,300 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Krishak Shayak - Full Stack Deployment (EC2 + Nginx + Redis + Node.js)'
+
+# ─────────────────────────────────────────────
+# PARAMETERS — Configurable inputs
+# ─────────────────────────────────────────────
+Parameters:
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: 'Name of an existing EC2 KeyPair for SSH access'
+
+  LatestUbuntuAMI:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id'
+    Description: 'Ubuntu 24.04 LTS AMI dynamically resolved from AWS SSM'
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: 'EC2 instance type (t2.micro is free tier eligible)'
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t3.micro
+      - t3.small
+
+  MongoDBURI:
+    Type: String
+    NoEcho: true
+    Description: 'MongoDB Atlas connection string'
+    Default: 'mongodb+srv://lavishshakya066:lavishshakya@cluster0.rzc43hp.mongodb.net/krishak-shayak'
+
+  JWTSecret:
+    Type: String
+    NoEcho: true
+    Description: 'JWT secret key'
+    Default: 'your_jwt_secret_key_here'
+
+  OpenWeatherAPIKey:
+    Type: String
+    NoEcho: true
+    Description: 'OpenWeatherMap API Key'
+    Default: '97a99a6978e3f046029de9c4a8a54795'
+
+  DataGovAPIKey:
+    Type: String
+    NoEcho: true
+    Description: 'Data.gov.in API Key'
+    Default: '579b464db66ec23bdd00000193b99a55112f47fa73efacc0606e14af'
+
+  SchemesSheetURL:
+    Type: String
+    Description: 'Google Sheets CSV URL for schemes'
+    Default: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8mT0irSMHILjGeErV49_3ALKvYG3_U4I37c1WzdZkirOA-3wqc2ioMnYE_Bwm8GHYbqK5CsGj3K2k/pub?output=csv'
+
+# ─────────────────────────────────────────────
+# RESOURCES
+# ─────────────────────────────────────────────
+Resources:
+
+  # Security Group — allows SSH (22), HTTP (80), HTTPS (443), and Node.js (5000)
+  AppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Krishak Shayak - Allow SSH, HTTP, HTTPS, App Port'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: 'SSH access'
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: 'HTTP web access'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: 'HTTPS access (SSL)'
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+          CidrIp: 0.0.0.0/0
+          Description: 'Direct backend API access'
+      Tags:
+        - Key: Name
+          Value: krishak-shayak-sg
+
+  # EC2 Instance — single server hosting Frontend, Backend, Redis, and Nginx
+  AppServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      ImageId: !Ref LatestUbuntuAMI
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 20
+            VolumeType: gp3
+            DeleteOnTermination: true
+      SecurityGroups:
+        - !Ref AppSecurityGroup
+      Tags:
+        - Key: Name
+          Value: krishak-shayak-server
+
+      # ─────────────────────────────────────
+      # USER DATA — Automated Bootstrap Script
+      # ─────────────────────────────────────
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -e
+          exec > /var/log/user-data.log 2>&1
+
+          echo "========================================="
+          echo "  Krishak Shayak — EC2 Setup Starting"
+          echo "========================================="
+
+          # ── 1. Create Swap Space (2GB) ──
+          # Vital for t2.micro (1GB RAM) during npm build
+          if [ ! -f /swapfile ]; then
+              echo ">>> Creating 2GB swap space..."
+              fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+              chmod 600 /swapfile
+              mkswap /swapfile
+              swapon /swapfile
+              echo '/swapfile none swap sw 0 0' >> /etc/fstab
+          fi
+
+          # ── 2. System Updates ──
+          echo ">>> Updating system packages..."
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -y
+          apt-get upgrade -y
+
+          # ── 3. Install Node.js 20.x ──
+          echo ">>> Installing Node.js..."
+          curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+          apt-get install -y nodejs
+          echo "Node.js version: $(node -v)"
+          echo "npm version: $(npm -v)"
+
+          # ── 4. Install Redis ──
+          echo ">>> Installing Redis..."
+          apt-get install -y redis-server
+          systemctl start redis-server
+          systemctl enable redis-server
+          echo "Redis: $(redis-cli ping)"
+
+          # ── 5. Install Nginx ──
+          echo ">>> Installing Nginx..."
+          apt-get install -y nginx
+
+          # ── 6. Install PM2 ──
+          echo ">>> Installing PM2..."
+          npm install -g pm2
+
+          # ── 7. Install Git ──
+          apt-get install -y git
+
+          # ── 8. Permissions ──
+          # Ensure Nginx (www-data) can read built frontend files in /home/ubuntu
+          chmod 755 /home/ubuntu
+
+          # ── 9. Detect Public IP ──
+          TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" || true)
+          PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4 || true)
+          if [ -z "$PUBLIC_IP" ]; then
+              PUBLIC_IP=$(curl -s http://checkip.amazonaws.com || curl -s ifconfig.me || echo "localhost")
+          fi
+          echo "Server Public IP: $PUBLIC_IP"
+
+          # ──────────────────────────────────
+          # BACKEND SETUP
+          # ──────────────────────────────────
+          echo ">>> Setting up Backend..."
+          cd /home/ubuntu
+          rm -rf Krishak_Shayak_Backend
+          sudo -u ubuntu git clone https://github.com/Webdevproject123/Krishak_Shayak_Backend.git
+          cd Krishak_Shayak_Backend
+
+          sudo -u ubuntu cat > .env << 'ENVEOF'
+          NODE_ENV=production
+          PORT=5000
+          MONGODB_URI=${MongoDBURI}
+          JWT_SECRET=${JWTSecret}
+          JWT_LIFETIME=30d
+          OPENWEATHER_API_KEY=${OpenWeatherAPIKey}
+          REDIS_URL=redis://127.0.0.1:6379
+          DATA_GOV_API_KEY=${DataGovAPIKey}
+          SCHEMES_SHEET_URL=${SchemesSheetURL}
+          FRONTEND_URL=*
+          ENVEOF
+
+          sudo -u ubuntu npm install
+          sudo -u ubuntu pm2 start index.js --name "krishak-backend"
+          sudo -u ubuntu pm2 save
+
+          # Configure PM2 startup on system boot
+          env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+          sudo -u ubuntu pm2 save
+
+          # ──────────────────────────────────
+          # FRONTEND SETUP
+          # ──────────────────────────────────
+          echo ">>> Setting up Frontend..."
+          cd /home/ubuntu
+          rm -rf Krishak_Shayak_Frontend
+          sudo -u ubuntu git clone https://github.com/Webdevproject123/Krishak_Shayak_Frontend.git
+          cd Krishak_Shayak_Frontend
+
+          sudo -u ubuntu cat > .env << FENVEOF
+          VITE_API_URL=/api
+          VITE_RAZORPAY_KEY_ID=rzp_test_R6tg4pGRMJdWns
+          VITE_WEATHER_API_KEY=${OpenWeatherAPIKey}
+          VITE_WEATHER_BASE_URL=https://api.openweathermap.org
+          VITE_NEWSDATA_API_KEY=pub_2f4c600e7310491fb5df044fc12ba621
+          FENVEOF
+
+          sudo -u ubuntu npm install
+          sudo -u ubuntu npm run build
+
+          # ──────────────────────────────────
+          # NGINX CONFIGURATION
+          # ──────────────────────────────────
+          echo ">>> Configuring Nginx reverse proxy..."
+          cat > /etc/nginx/sites-available/krishak-shayak << 'NGINXEOF'
+          server {
+              listen 80 default_server;
+              server_name _;
+
+              # Gzip compression
+              gzip on;
+              gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+              gzip_min_length 1000;
+
+              # Frontend static build
+              root /home/ubuntu/Krishak_Shayak_Frontend/dist;
+              index index.html;
+
+              location / {
+                  try_files $uri $uri/ /index.html;
+              }
+
+              # Backend API proxy
+              location /api/ {
+                  proxy_pass http://127.0.0.1:5000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $http_host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_cache_bypass $http_upgrade;
+                  proxy_read_timeout 60s;
+              }
+
+              # Cache static assets
+              location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf)$ {
+                  expires 30d;
+                  add_header Cache-Control "public, immutable";
+              }
+          }
+          NGINXEOF
+
+          ln -sf /etc/nginx/sites-available/krishak-shayak /etc/nginx/sites-enabled/
+          rm -f /etc/nginx/sites-enabled/default
+          nginx -t
+          systemctl restart nginx
+
+          echo "========================================="
+          echo "  DEPLOYMENT COMPLETE!"
+          echo "  App: http://$PUBLIC_IP"
+          echo "  API: http://$PUBLIC_IP/api"
+          echo "========================================="
+
+# ─────────────────────────────────────────────
+# OUTPUTS — Stack information
+# ─────────────────────────────────────────────
+Outputs:
+  WebsiteURL:
+    Description: 'Application URL (Open in browser)'
+    Value: !Sub 'http://${AppServer.PublicIp}'
+
+  APIURL:
+    Description: 'Backend API URL'
+    Value: !Sub 'http://${AppServer.PublicIp}/api'
+
+  SSHCommand:
+    Description: 'SSH command to connect to the EC2 server'
+    Value: !Sub 'ssh -i ${KeyPairName}.pem ubuntu@${AppServer.PublicIp}'
+
+  PublicIP:
+    Description: 'EC2 Public IP Address'
+    Value: !GetAtt AppServer.PublicIp
