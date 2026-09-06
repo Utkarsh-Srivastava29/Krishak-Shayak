@@ -6,7 +6,7 @@ on:
       key_pair_name:
         description: 'Existing EC2 KeyPair Name in AWS'
         required: true
-        default: 'krishak-key'
+        default: 'krishakShayak-key'
       aws_region:
         description: 'AWS Region to deploy into'
         required: true
