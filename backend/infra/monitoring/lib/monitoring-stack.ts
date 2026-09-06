@@ -16,7 +16,7 @@ export interface MonitoringStackProps extends cdk.StackProps {
 
   /**
    * Email to receive downtime and performance alerts
-   * @default 'lavishshakya066@gmail.com'
+   * @default 'lavishshakyaprep@gmail.com'
    */
   readonly alertEmail?: string;
 }
@@ -26,7 +26,7 @@ export class MonitoringStack extends cdk.Stack {
     super(scope, id, props);
 
     const domain = props?.domainName || 'krishakshayak.duckdns.org';
-    const email = props?.alertEmail || 'lavishshakya066@gmail.com';
+    const email = props?.alertEmail || 'lavishshakyaprep@gmail.com';
 
     // ─────────────────────────────────────────────
     // 1. ALERTING: SNS Topic & Email Subscription
