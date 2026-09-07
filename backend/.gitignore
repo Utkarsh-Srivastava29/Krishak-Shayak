@@ -39,3 +39,5 @@ build/
 # CDK
 cdk.out/
 .cdk.staging/
+infra/monitoring/**/*.js
+infra/monitoring/**/*.d.ts

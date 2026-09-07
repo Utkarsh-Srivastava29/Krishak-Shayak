@@ -54,12 +54,17 @@ export class MonitoringStack extends cdk.Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
+    // AWS Free Tier includes 100 canary runs/month across your entire AWS account.
+    // 6 Canaries * 15 runs/month (once every 2 days) = 90 runs/month <= 100 (100% Free Tier).
+    // Note: AWS Synthetics rate() only allows 1-60 minutes. Schedules > 1 hour must use cron expressions.
+    const freeTierSchedule = synthetics.Schedule.expression('cron(0 0 */2 * ? *)');
+
     // ─────────────────────────────────────────────
     // 3. SYNTHETICS CANARY: Frontend Web Uptime
     // ─────────────────────────────────────────────
     const frontendCanary = new synthetics.Canary(this, 'FrontendCanary', {
       canaryName: 'ks-frontend-check',
-      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      schedule: freeTierSchedule,
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
       test: synthetics.Test.custom({
@@ -97,7 +102,7 @@ exports.handler = async () => {
     // ─────────────────────────────────────────────
     const schemesCanary = new synthetics.Canary(this, 'SchemesApiCanary', {
       canaryName: 'ks-schemes-check',
-      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      schedule: freeTierSchedule,
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
       test: synthetics.Test.custom({
@@ -135,7 +140,7 @@ exports.handler = async () => {
     // ─────────────────────────────────────────────
     const weatherCanary = new synthetics.Canary(this, 'WeatherApiCanary', {
       canaryName: 'ks-weather-check',
-      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      schedule: freeTierSchedule,
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
       test: synthetics.Test.custom({
@@ -173,7 +178,7 @@ exports.handler = async () => {
     // ─────────────────────────────────────────────
     const marketPricesCanary = new synthetics.Canary(this, 'MarketPricesApiCanary', {
       canaryName: 'ks-market-check',
-      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      schedule: freeTierSchedule,
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
       test: synthetics.Test.custom({
@@ -211,7 +216,7 @@ exports.handler = async () => {
     // ─────────────────────────────────────────────
     const productsCanary = new synthetics.Canary(this, 'ProductsApiCanary', {
       canaryName: 'ks-products-check',
-      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      schedule: freeTierSchedule,
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
       test: synthetics.Test.custom({
@@ -249,7 +254,7 @@ exports.handler = async () => {
     // ─────────────────────────────────────────────
     const shopsCanary = new synthetics.Canary(this, 'ShopsApiCanary', {
       canaryName: 'ks-shops-check',
-      schedule: synthetics.Schedule.rate(cdk.Duration.minutes(5)),
+      schedule: freeTierSchedule,
       artifactsBucketLocation: { bucket: canaryArtifactsBucket },
       runtime: synthetics.Runtime.SYNTHETICS_NODEJS_PUPPETEER_8_0,
       test: synthetics.Test.custom({
