@@ -103,33 +103,66 @@ const isRedisReady = () => {
   return isConnected && redisClient && redisClient.status === "ready";
 };
 
+// ---------------------------------------------------------------------------
+// In-process fallback cache
+// ---------------------------------------------------------------------------
+// Without this, every cached route degrades to zero caching whenever Redis is
+// unavailable — which silently burns paid upstream API calls. It is per-process
+// and not shared across instances, so Redis is still the real cache in
+// production; this only stops a Redis outage from becoming an upstream bill.
+const memoryCache = new Map();
+const MEMORY_CACHE_MAX_KEYS = 500;
+
+const memoryGet = (key) => {
+  const entry = memoryCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    memoryCache.delete(key);
+    return null;
+  }
+  return entry.value;
+};
+
+const memorySet = (key, data, ttlSeconds) => {
+  if (memoryCache.size >= MEMORY_CACHE_MAX_KEYS && !memoryCache.has(key)) {
+    memoryCache.delete(memoryCache.keys().next().value);
+  }
+  memoryCache.set(key, {
+    value: data,
+    expiresAt: Date.now() + ttlSeconds * 1000,
+  });
+};
+
 /**
  * Get a cached value by key. Returns parsed JSON or null.
+ * Falls back to the in-process cache when Redis is unavailable.
  */
 const getCache = async (key) => {
   const client = getRedisClient();
-  if (!client) return null;
+  if (!client) return memoryGet(key);
 
   try {
     const data = await client.get(key);
     return data ? JSON.parse(data) : null;
   } catch (err) {
     console.error(`[REDIS] Error getting key "${key}":`, err.message);
-    return null;
+    return memoryGet(key);
   }
 };
 
 /**
  * Set a cached value with TTL (in seconds).
+ * Falls back to the in-process cache when Redis is unavailable.
  */
 const setCache = async (key, data, ttlSeconds) => {
   const client = getRedisClient();
-  if (!client) return;
+  if (!client) return memorySet(key, data, ttlSeconds);
 
   try {
     await client.setex(key, ttlSeconds, JSON.stringify(data));
   } catch (err) {
     console.error(`[REDIS] Error setting key "${key}":`, err.message);
+    memorySet(key, data, ttlSeconds);
   }
 };
 
@@ -137,6 +170,8 @@ const setCache = async (key, data, ttlSeconds) => {
  * Delete a specific cache key.
  */
 const delCache = async (key) => {
+  memoryCache.delete(key);
+
   const client = getRedisClient();
   if (!client) return;
 
@@ -152,6 +187,11 @@ const delCache = async (key) => {
  * Uses SCAN to avoid blocking Redis with KEYS command.
  */
 const delCacheByPattern = async (pattern) => {
+  const prefix = pattern.replace(/\*$/, "");
+  for (const key of memoryCache.keys()) {
+    if (key.startsWith(prefix)) memoryCache.delete(key);
+  }
+
   const client = getRedisClient();
   if (!client) return;
 
