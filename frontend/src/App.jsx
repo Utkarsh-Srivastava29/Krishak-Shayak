@@ -21,6 +21,7 @@ import EditProduct from "./pages/EditProduct";
 import GovtSchemes from "./pages/GovtSchemes";
 import Health from "./pages/Health";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AssistantChatbot from "./components/AssistantChatbot";
 import "./index.css";
 
 function App() {
@@ -145,6 +146,8 @@ function App() {
         {/* Fallback route */}
         <Route path="*" element={<Home />} />
       </Routes>
+
+      <AssistantChatbot />
     </Router>
   );
 }

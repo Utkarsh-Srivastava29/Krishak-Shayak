@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "./api";
 
 // Replace with your actual API key from OpenWeatherMap
 const API_KEY =
@@ -370,63 +371,6 @@ function getWeatherIcon(conditionCode) {
 }
 
 // Agricultural tips based on weather data
-export const getAgricultureTips = (weatherData) => {
-  const tips = [];
-
-  // Based on temperature
-  if (weatherData.current.temp > 30) {
-    tips.push("Ensure adequate irrigation for crops due to high temperatures.");
-    tips.push("Consider providing shade for sensitive seedlings.");
-  } else if (weatherData.current.temp < 15) {
-    tips.push("Protect frost-sensitive crops with covers.");
-    tips.push("Delay planting of warm-season crops until temperatures rise.");
-  }
-
-  // Based on forecast
-  const rainyDaysForecast = weatherData.forecast.filter(
-    (day) =>
-      day.condition.toLowerCase().includes("rain") ||
-      day.condition.toLowerCase().includes("shower") ||
-      day.condition.toLowerCase().includes("drizzle") ||
-      day.condition.toLowerCase().includes("thunderstorm")
-  );
-
-  if (rainyDaysForecast.length > 2) {
-    tips.push(
-      "Expected rainfall in coming days - delay fertilizer application."
-    );
-    tips.push("Ensure proper drainage in fields to prevent waterlogging.");
-  } else if (rainyDaysForecast.length === 0) {
-    tips.push("No rain expected soon - ensure adequate irrigation.");
-  }
-
-  // Based on humidity
-  if (weatherData.current.humidity > 80) {
-    tips.push(
-      "High humidity levels increase risk of fungal diseases. Monitor crops closely."
-    );
-    tips.push(
-      "Ensure good air circulation around plants to reduce disease pressure."
-    );
-  } else if (weatherData.current.humidity < 40) {
-    tips.push(
-      "Low humidity may increase water loss. Consider more frequent irrigation."
-    );
-  }
-
-  // Based on wind
-  if (weatherData.current.windSpeed > 25) {
-    tips.push(
-      "High winds expected - secure young plants and provide windbreaks if possible."
-    );
-  }
-
-  // General tips
-  tips.push("Monitor soil moisture regularly for optimal crop health.");
-  tips.push("Consider mulching to conserve soil moisture and control weeds.");
-
-  return tips;
-};
 
 // Function to get location suggestions based on input
 export const getSuggestedCities = async (input) => {
@@ -450,33 +394,6 @@ export const getSuggestedCities = async (input) => {
 };
 
 // Calculate soil moisture index based on weather data
-export const calculateSoilMoistureIndex = (weatherData) => {
-  // Base value from humidity
-  let moistureIndex = weatherData.current.humidity / 100;
-
-  // Adjust based on recent rainfall
-  const rainyDays = weatherData.forecast
-    .slice(0, 3)
-    .filter(
-      (day) =>
-        day.condition.toLowerCase().includes("rain") ||
-        day.condition.toLowerCase().includes("shower") ||
-        day.condition.toLowerCase().includes("drizzle") ||
-        day.condition.toLowerCase().includes("thunder")
-    ).length;
-
-  moistureIndex += rainyDays * 0.1;
-
-  // Reduce for high temperatures
-  if (weatherData.current.temp > 35) {
-    moistureIndex -= 0.15;
-  } else if (weatherData.current.temp > 30) {
-    moistureIndex -= 0.1;
-  }
-
-  // Ensure within bounds
-  return Math.max(0, Math.min(moistureIndex, 1));
-};
 
 // Implementation for getting more detailed hourly forecast
 // This is an alternative implementation that you could use
@@ -543,4 +460,13 @@ const processHourlyData = (apiData) => {
 const formatHourTime = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
+// Real root-zone soil moisture (Open-Meteo) plus weather-specific advice (Gemini),
+// both served by our backend so no keys are exposed to the browser.
+export const getWeatherInsights = async (location, lang = "en") => {
+  const response = await axios.get(`${API_URL}/weather/insights`, {
+    params: { location, lang },
+  });
+  return response.data;
 };

@@ -1,30 +1,45 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import {
   getWeatherData,
-  getAgricultureTips,
   getHourlyForecast,
   getSuggestedCities,
   getExtendedForecast,
-  calculateSoilMoistureIndex,
+  getWeatherInsights,
 } from "../services/weatherService";
 
 const Weather = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [location, setLocation] = useState("");
   const [weatherData, setWeatherData] = useState(null);
   const [hourlyData, setHourlyData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tips, setTips] = useState([]);
-  const [soilMoisture, setSoilMoisture] = useState(0.5);
+  const [insights, setInsights] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
   const [showHourlyForecast, setShowHourlyForecast] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [forecastDays, setForecastDays] = useState(5);
   const [extendedForecast, setExtendedForecast] = useState([]);
+
+  // Soil moisture and advice come from the backend, which pairs real Open-Meteo
+  // measurements with generated guidance. Slower than the forecast, so it loads
+  // independently rather than holding up the rest of the page.
+  const loadInsights = async (targetLocation) => {
+    setInsightsLoading(true);
+    setInsights(null);
+    try {
+      const language = i18n.language?.startsWith("hi") ? "hi" : "en";
+      setInsights(await getWeatherInsights(targetLocation, language));
+    } catch (err) {
+      console.error("Failed to load weather insights:", err);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -44,13 +59,7 @@ const Weather = () => {
         const extendedForecastData = await getExtendedForecast("Delhi, IN");
         setExtendedForecast(extendedForecastData);
 
-        // Generate agricultural tips based on weather data
-        const agricultureTips = getAgricultureTips(data);
-        setTips(agricultureTips);
-
-        // Calculate and set soil moisture index
-        const soilMoistureIndex = calculateSoilMoistureIndex(data);
-        setSoilMoisture(soilMoistureIndex);
+        loadInsights("Delhi, IN");
       } catch (err) {
         console.error("Failed to fetch weather data:", err);
         setError("Unable to load weather data. Please try again later.");
@@ -86,13 +95,7 @@ const Weather = () => {
       const extendedForecastData = await getExtendedForecast(locToSearch);
       setExtendedForecast(extendedForecastData);
 
-      // Generate agricultural tips based on new weather data
-      const agricultureTips = getAgricultureTips(data);
-      setTips(agricultureTips);
-
-      // Calculate and set soil moisture index
-      const soilMoistureIndex = calculateSoilMoistureIndex(data);
-      setSoilMoisture(soilMoistureIndex);
+      loadInsights(locToSearch);
     } catch (err) {
       console.error("Failed to fetch weather data:", err);
       // More helpful error message
@@ -107,37 +110,6 @@ const Weather = () => {
   const handleSearch = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     await fetchWeatherForCity();
-  };
-
-  // Add these functions to predict soil moisture
-  const calculateSoilMoistureIndex = (weatherData) => {
-    // Simple prediction model based on recent rainfall and temperature
-    const { current, forecast } = weatherData;
-
-    // Base value from humidity
-    let moistureIndex = current.humidity / 100;
-
-    // Adjust based on recent rainfall patterns
-    const rainyDays = forecast
-      .slice(0, 3)
-      .filter(
-        (day) =>
-          day.condition.toLowerCase().includes("rain") ||
-          day.condition.toLowerCase().includes("shower") ||
-          day.condition.toLowerCase().includes("drizzle")
-      ).length;
-
-    moistureIndex += rainyDays * 0.1;
-
-    // Reduce for high temperatures
-    if (current.temp > 35) {
-      moistureIndex -= 0.15;
-    } else if (current.temp > 30) {
-      moistureIndex -= 0.1;
-    }
-
-    // Ensure within bounds
-    return Math.max(0, Math.min(moistureIndex, 1));
   };
 
   // Function to toggle hourly forecast visibility
@@ -756,45 +728,69 @@ const Weather = () => {
                 </p>
               </div>
 
-              {/* Estimated Soil Moisture */}
+              {/* Measured Soil Moisture */}
               <div className="mt-8 max-w-xl mx-auto">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  Estimated Soil Moisture
+                  Soil Moisture
                 </h2>
                 <div className="bg-white rounded-lg shadow-md p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-700">Soil Moisture Level:</span>
-                    <span className="font-bold">
-                      {soilMoisture < 0.3
-                        ? "Low"
-                        : soilMoisture > 0.7
-                          ? "High"
-                          : "Moderate"}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div
-                      className={`h-4 rounded-full ${soilMoisture < 0.3
-                          ? "bg-orange-500"
-                          : soilMoisture > 0.7
-                            ? "bg-blue-500"
-                            : "bg-green-500"
-                        }`}
-                      style={{ width: `${soilMoisture * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Dry</span>
-                    <span>Moderate</span>
-                    <span>Wet</span>
-                  </div>
-                  <p className="text-sm mt-3 text-gray-600">
-                    {soilMoisture < 0.3
-                      ? "Soil moisture is low. Consider irrigation to prevent crop stress."
-                      : soilMoisture > 0.7
-                        ? "Soil moisture is high. Monitor for potential waterlogging issues."
-                        : "Soil moisture is at an optimal level for most crops."}
-                  </p>
+                  {insightsLoading && !insights ? (
+                    <div className="flex items-center text-gray-500 text-sm py-4">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500 mr-3"></div>
+                      Measuring soil moisture...
+                    </div>
+                  ) : insights ? (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-gray-700">
+                          Root zone ({insights.soilMoisture.depth}):
+                        </span>
+                        <span className="font-bold capitalize">
+                          {insights.soilMoisture.level}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-4">
+                        <div
+                          className={`h-4 rounded-full transition-all ${
+                            insights.soilMoisture.level === "low"
+                              ? "bg-orange-500"
+                              : insights.soilMoisture.level === "high"
+                                ? "bg-blue-500"
+                                : "bg-green-500"
+                          }`}
+                          style={{
+                            width: `${insights.soilMoisture.fill * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Dry</span>
+                        <span>Moderate</span>
+                        <span>Saturated</span>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                        <span>
+                          Water content:{" "}
+                          <strong>
+                            {insights.soilMoisture.value} {insights.soilMoisture.unit}
+                          </strong>
+                        </span>
+                        {insights.soilMoisture.soilTemp !== null && (
+                          <span>
+                            Soil temp:{" "}
+                            <strong>{insights.soilMoisture.soilTemp}°C</strong>
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-2 text-xs text-gray-400">
+                        Measured values from Open-Meteo, not estimated from air humidity.
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-500 py-2">
+                      Soil moisture is unavailable for this location right now.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -804,27 +800,47 @@ const Weather = () => {
                   Agricultural Weather Tips
                 </h2>
                 <div className="bg-green-50 rounded-lg p-6 border border-green-200">
-                  <ul className="space-y-2">
-                    {tips.map((tip, index) => (
-                      <li key={index} className="flex items-start">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 text-green-600 mr-2 mt-0.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {insightsLoading && !insights ? (
+                    <div className="flex items-center text-gray-500 text-sm">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600 mr-3"></div>
+                      Preparing advice for today's conditions...
+                    </div>
+                  ) : insights ? (
+                    <>
+                      <ul className="space-y-2">
+                        {insights.tips.map((tip, index) => (
+                          <li key={index} className="flex items-start">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span>{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {insights.generated && (
+                        <p className="mt-4 pt-3 border-t border-green-200 text-xs text-gray-500">
+                          Generated for today's conditions at this location. Check
+                          with your local agriculture officer before acting on
+                          anything costly.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      Advice is unavailable right now. Please try again later.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

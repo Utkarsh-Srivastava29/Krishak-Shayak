@@ -81,6 +81,22 @@
     "noSchemes": "No schemes found",
     "noSchemesHint": "Try adjusting your search or filter criteria"
   },
+  "assistant": {
+    "open": "Ask Krishak Sahayak",
+    "close": "Close chat",
+    "clear": "Start a new chat",
+    "title": "Krishak Sahayak",
+    "subtitle": "Schemes, crops, prices and more",
+    "greeting": "Namaste! Ask me about government schemes, farming advice, or how to use this app.",
+    "placeholder": "Type your question...",
+    "send": "Send",
+    "disclaimer": "Scheme answers come from the official list. Always verify before applying.",
+    "suggestions": [
+      "Which schemes give direct cash support?",
+      "When should I sow wheat?",
+      "How do I check mandi prices here?"
+    ]
+  },
   "marketplace": {
     "title": "Agricultural Marketplace - Shops",
     "sellProduct": "Sell Product",
@@ -129,20 +145,19 @@
   },
   "weather": {
     "title": "Weather Forecast",
-    "subtitle": "Get accurate weather updates for your farm location",
-    "searchPlaceholder": "Search for a city...",
+    "placeholder": "Enter location (e.g., Delhi, IN)",
+    "loading": "Loading",
     "search": "Search",
-    "loading": "Loading weather data...",
-    "error": "Failed to load weather data",
+    "popularCities": "Popular Cities:",
+    "currentWeather": "Current Weather",
+    "feelsLike": "Feels like",
     "humidity": "Humidity",
     "wind": "Wind",
-    "visibility": "Visibility",
-    "pressure": "Pressure",
-    "feelsLike": "Feels Like",
-    "sunrise": "Sunrise",
-    "sunset": "Sunset",
-    "forecast": "5-Day Forecast",
-    "noData": "No weather data available"
+    "precipitation": "Precipitation",
+    "showHourly": "Show Hourly Forecast",
+    "hideHourly": "Hide Hourly Forecast",
+    "extended": "Extended Forecast",
+    "days": "Days"
   },
   "login": {
     "title": "Login to your account",
@@ -364,21 +379,5 @@
     "totalProducts": "Total Products",
     "noProducts": "No products yet",
     "noProductsHint": "Add your first product to get started"
-  },
-  "weather": {
-    "title": "Weather Forecast",
-    "placeholder": "Enter location (e.g., Delhi, IN)",
-    "loading": "Loading",
-    "search": "Search",
-    "popularCities": "Popular Cities:",
-    "currentWeather": "Current Weather",
-    "feelsLike": "Feels like",
-    "humidity": "Humidity",
-    "wind": "Wind",
-    "precipitation": "Precipitation",
-    "showHourly": "Show Hourly Forecast",
-    "hideHourly": "Hide Hourly Forecast",
-    "extended": "Extended Forecast",
-    "days": "Days"
   }
 }
