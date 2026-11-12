@@ -1,0 +1,140 @@
+name: Deploy to EC2
+
+# One workflow for this monorepo. On every push to main it updates the EC2
+# server: it pulls this repo, syncs backend/ and frontend/ into the folders
+# nginx and PM2 already use, then restarts the API and rebuilds the site.
+#
+# Repository secrets needed (Settings → Secrets and variables → Actions):
+#   EC2_HOST         server address (e.g. krishakshayak.duckdns.org)
+#   EC2_SSH_KEY      private key for the "ubuntu" user
+#   GEMINI_API_KEY   optional: written to the server's backend .env
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Redeploy backend and frontend even if nothing changed"
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy-ec2
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy backend + frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FORCE_DEPLOY: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+          REPO_URL: https://github.com/${{ github.repository }}.git
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GEMINI_API_KEY,FORCE_DEPLOY,REPO_URL
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+
+            command -v rsync > /dev/null || sudo apt-get install -y rsync
+
+            REPO_DIR=/home/ubuntu/Krishak-Shayak
+            BACKEND_DIR=/home/ubuntu/Krishak_Shayak_Backend   # PM2 runs the API from here
+            FRONTEND_DIR=/home/ubuntu/Krishak_Shayak_Frontend # nginx serves $FRONTEND_DIR/dist
+
+            echo ">>> Updating $REPO_DIR"
+            if [ -d "$REPO_DIR/.git" ]; then
+              git -C "$REPO_DIR" fetch --depth 50 origin main
+              git -C "$REPO_DIR" reset --hard origin/main
+            else
+              git clone --depth 50 "$REPO_URL" "$REPO_DIR"
+            fi
+
+            NEW_SHA=$(git -C "$REPO_DIR" rev-parse HEAD)
+            OLD_SHA=$(cat "$REPO_DIR/.deployed-sha" 2>/dev/null || true)
+
+            # Work out what changed since the last deploy.
+            DEPLOY_BACKEND=true
+            DEPLOY_FRONTEND=true
+            if [ "${FORCE_DEPLOY:-false}" != "true" ] && [ -n "$OLD_SHA" ] && git -C "$REPO_DIR" cat-file -e "$OLD_SHA" 2>/dev/null; then
+              CHANGED=$(git -C "$REPO_DIR" diff --name-only "$OLD_SHA" "$NEW_SHA")
+              grep -q '^backend/' <<< "$CHANGED" || DEPLOY_BACKEND=false
+              grep -q '^frontend/' <<< "$CHANGED" || DEPLOY_FRONTEND=false
+            fi
+            echo "Backend: $DEPLOY_BACKEND  Frontend: $DEPLOY_FRONTEND"
+
+            # Copy files in place; keep each folder's .env, node_modules and build.
+            sync_dir() {
+              mkdir -p "$2"
+              rsync -a --delete \
+                --exclude '.git' --exclude '.env' --exclude 'node_modules' --exclude 'dist' \
+                --exclude 'eval/.cache' --exclude 'eval/results' \
+                "$1/" "$2/"
+            }
+
+            # Set KEY=VALUE in an .env file (replace if present, append if not).
+            set_env() {
+              local file="$1" key="$2" value="$3"
+              touch "$file"
+              if grep -q "^${key}=" "$file"; then
+                sed -i "s|^${key}=.*|${key}=${value}|" "$file"
+              else
+                echo "${key}=${value}" >> "$file"
+              fi
+            }
+            add_env_if_missing() {
+              grep -q "^$2=" "$1" 2>/dev/null || echo "$2=$3" >> "$1"
+            }
+
+            if [ "$DEPLOY_BACKEND" = "true" ]; then
+              echo ">>> Deploying backend"
+              sync_dir "$REPO_DIR/backend" "$BACKEND_DIR"
+              cd "$BACKEND_DIR"
+
+              ENV_FILE="$BACKEND_DIR/.env"
+              if [ -n "${GEMINI_API_KEY:-}" ]; then set_env "$ENV_FILE" GEMINI_API_KEY "$GEMINI_API_KEY"; fi
+              # EC2 is always on, so BullMQ schedules the daily jobs itself.
+              add_env_if_missing "$ENV_FILE" JOB_SCHEDULER bullmq
+              add_env_if_missing "$ENV_FILE" VECTOR_SEARCH_MODE local
+              add_env_if_missing "$ENV_FILE" REDIS_URL redis://127.0.0.1:6379
+
+              npm install --no-audit --no-fund
+
+              pm2 restart krishak-backend --update-env || pm2 start index.js --name krishak-backend
+              pm2 save
+
+              # Build/refresh the RAG knowledge base (skips unchanged documents).
+              if grep -q '^GEMINI_API_KEY=.\+' "$ENV_FILE"; then
+                npm run rag:ingest || echo "WARNING: rag:ingest failed; the assistant falls back to keyword search."
+              else
+                echo "WARNING: GEMINI_API_KEY is not set in $ENV_FILE — the AI assistant will not answer."
+              fi
+
+              sleep 3
+              curl -fsS http://127.0.0.1:5000/ > /dev/null && echo "Backend is up" || (pm2 logs krishak-backend --lines 40 --nostream; exit 1)
+            fi
+
+            if [ "$DEPLOY_FRONTEND" = "true" ]; then
+              echo ">>> Deploying frontend"
+              sync_dir "$REPO_DIR/frontend" "$FRONTEND_DIR"
+              cd "$FRONTEND_DIR"
+              add_env_if_missing "$FRONTEND_DIR/.env" VITE_API_URL /api
+              npm install --no-audit --no-fund
+              npm run build
+              echo "Frontend built into $FRONTEND_DIR/dist"
+            fi
+
+            echo "$NEW_SHA" > "$REPO_DIR/.deployed-sha"
+            echo ">>> Deployed $NEW_SHA"
+            pm2 status
