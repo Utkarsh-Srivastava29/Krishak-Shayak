@@ -9,6 +9,7 @@ Farmer ──SSE──► /api/chat ──► ReAct agent loop (Gemini function 
                                  ├── get_mandi_prices       data.gov.in Agmarknet (+ own price history)
                                  ├── search_knowledge       Hybrid RAG over the scheme catalogue
                                  ├── get_soil_moisture      Open-Meteo
+                                 ├── recommend_crops        crop calendar + forecast + soil + mandi prices
                                  ├── search_marketplace     MongoDB products
                                  ├── add_to_cart            ┐ write actions: proposed only,
                                  └── log_farm_activity      ┘ executed after the farmer taps Confirm
@@ -134,7 +135,7 @@ npm run eval -- --resume eval/results/eval-<time>.json
 2. In `.env`, set `GEMINI_API_KEY`, `MONGODB_URI`, `REDIS_URL` and `OPENWEATHER_API_KEY`, then the new section of `.env.example`.
 3. `npm run rag:ingest` builds the knowledge base. Re-run it whenever the scheme sheet changes.
 4. On Render free tier: create a free Upstash QStash project and set `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` and `PUBLIC_API_URL`. Then run `npm run jobs:schedule` once.
-5. `npm run test:ai` runs the 36 unit tests for the agent loop, actions, RAG, memory, jobs, alerts and SSE. They need no network.
+5. `npm run test:ai` runs the 54 unit tests for the agent loop, actions, RAG, memory, jobs, alerts, SSE, crop recommendations, news and Hindi translation. `npm run test:payment` runs the 12 payment tests. None need the network.
 6. `npm run eval` runs the evaluation.
 
 ## Free tiers used
