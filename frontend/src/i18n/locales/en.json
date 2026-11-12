@@ -86,16 +86,25 @@
     "close": "Close chat",
     "clear": "Start a new chat",
     "title": "Krishak Sahayak",
-    "subtitle": "Schemes, crops, prices and more",
-    "greeting": "Namaste! Ask me about government schemes, farming advice, or how to use this app.",
+    "subtitle": "Live prices, weather, schemes and more",
+    "greeting": "Namaste! Ask me about mandi prices, the weather on your farm, government schemes, or what to buy. I check live data before answering.",
     "placeholder": "Type your question...",
     "send": "Send",
-    "disclaimer": "Scheme answers come from the official list. Always verify before applying.",
+    "disclaimer": "Answers use live data and the official scheme list. Always verify before applying.",
     "suggestions": [
-      "Which schemes give direct cash support?",
-      "When should I sow wheat?",
-      "How do I check mandi prices here?"
-    ]
+      "Should I sell my wheat this week?",
+      "Will it rain in my district before I spray?",
+      "Which schemes give direct cash support?"
+    ],
+    "sources": "Sources",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "confirmed": "Done",
+    "cancelled": "Cancelled",
+    "actionFailed": "Could not complete this. Please try again.",
+    "memoryLink": "What I remember",
+    "signInForMemory": "Sign in so I can remember your farm.",
+    "working": "Working…"
   },
   "marketplace": {
     "title": "Agricultural Marketplace - Shops",
@@ -379,5 +388,35 @@
     "totalProducts": "Total Products",
     "noProducts": "No products yet",
     "noProductsHint": "Add your first product to get started"
+  },
+  "farmMemory": {
+    "title": "What Krishak Sahayak remembers",
+    "subtitle": "The assistant uses these details to personalise advice. You can correct or delete anything.",
+    "profile": "Farm profile",
+    "activity": "Farm diary",
+    "history": "Earlier history",
+    "empty": "Nothing saved yet. Tell the assistant about your farm — your district, crops and land — and it will appear here.",
+    "addFact": "Add a detail",
+    "addPlaceholder": "e.g. I grow mustard on 2 acres in Etawah",
+    "addActivity": "Add to farm diary",
+    "activityPlaceholder": "e.g. Sprayed neem oil on wheat",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleteAll": "Forget everything",
+    "confirmDeleteAll": "Delete everything the assistant remembers about you?",
+    "planned": "Planned",
+    "fromChat": "from chat",
+    "fromYou": "added by you",
+    "fromAction": "confirmed in chat",
+    "fromSummary": "summary",
+    "error": "Something went wrong. Please try again."
+  },
+  "alerts": {
+    "title": "Alerts for your farm",
+    "empty": "No alerts yet. Alerts appear when weather or prices may affect your crops.",
+    "markRead": "Mark as read",
+    "manageMemory": "Manage what the assistant remembers"
   }
 }

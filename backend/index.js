@@ -14,6 +14,10 @@ const marketPriceRoutes = require("./routes/marketPriceRoutes");
 const schemeRoutes = require("./routes/schemeRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const healthRoutes = require("./routes/healthRoutes");
+const memoryRoutes = require("./routes/memoryRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const jobRoutes = require("./routes/jobRoutes");
+const { startWorker, registerBullSchedules } = require("./jobs/queue");
 const { connectRedis } = require("./config/redisClient");
 
 
@@ -55,7 +59,15 @@ app.use(
   })
 );
 // Increase payload size limit to handle large order data with images
-app.use(express.json({ limit: "50mb" }));
+app.use(
+  express.json({
+    limit: "50mb",
+    // Keep the exact bytes: QStash signs the raw body of job requests.
+    verify: (req, res, buf) => {
+      if (req.originalUrl.startsWith("/api/jobs/")) req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Connect to MongoDB
@@ -81,11 +93,29 @@ app.use("/api/market-prices", marketPriceRoutes);
 app.use("/api/schemes", schemeRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/memory", memoryRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/jobs", jobRoutes);
 
 // Basic route for testing
 app.get("/", (req, res) => {
   res.send("Krishak Shayak API is running");
 });
+
+// JSON errors for async route failures
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("Unhandled route error:", err.message);
+  if (res.headersSent) return;
+  res.status(err.status || 500).json({ message: "Server error" });
+});
+
+// Background jobs: BullMQ worker (memory consolidation, proactive alerts).
+// Triggered by Upstash QStash, or by BullMQ itself when JOB_SCHEDULER=bullmq.
+startWorker();
+if (process.env.JOB_SCHEDULER === "bullmq") {
+  registerBullSchedules().catch((err) => console.error("[JOBS] Schedule setup failed:", err.message));
+}
 
 // Start the server
 app.listen(PORT, () => {

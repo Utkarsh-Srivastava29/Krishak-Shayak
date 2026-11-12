@@ -20,6 +20,7 @@ import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import GovtSchemes from "./pages/GovtSchemes";
 import Health from "./pages/Health";
+import FarmMemory from "./pages/FarmMemory";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AssistantChatbot from "./components/AssistantChatbot";
 import "./index.css";
@@ -118,6 +119,15 @@ function App() {
           element={
             <ProtectedRoute requiredUserType="seller">
               <EditProduct />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/farm-memory"
+          element={
+            <ProtectedRoute>
+              <FarmMemory />
             </ProtectedRoute>
           }
         />

@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import authService from "../services/authService";
 import { getMyOrders } from "../services/marketplaceService";
+import FarmAlerts from "../components/FarmAlerts";
 
 const FarmerDashboard = () => {
   const { t } = useTranslation();
@@ -156,6 +157,9 @@ const FarmerDashboard = () => {
             {t('farmerDashboard.subtitle')}
           </p>
         </div>
+
+        {/* Proactive alerts from the AI advisor */}
+        <FarmAlerts />
 
         {/* Success/Error Messages */}
         {message.text && (

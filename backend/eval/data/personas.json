@@ -1,0 +1,67 @@
+[
+  {
+    "id": "ramesh",
+    "name": "Ramesh",
+    "language": "en",
+    "description": "Smallholder in Etawah, Uttar Pradesh. Grows mustard and wheat on 2 acres with a tube well. Practical, short questions.",
+    "memories": [
+      { "kind": "semantic", "key": "state", "value": "uttar pradesh", "text": "Farms in Uttar Pradesh." },
+      { "kind": "semantic", "key": "district", "value": "etawah", "text": "Farm is in Etawah district." },
+      { "kind": "semantic", "key": "crop", "value": "mustard", "text": "Grows mustard." },
+      { "kind": "semantic", "key": "crop", "value": "wheat", "text": "Grows wheat." },
+      { "kind": "semantic", "key": "land_size", "value": "2 acres", "text": "Has 2 acres of land." },
+      { "kind": "semantic", "key": "irrigation", "value": "tube well", "text": "Irrigates with a tube well." },
+      { "kind": "episodic", "text": "Sprayed insecticide on mustard for aphids.", "daysFromNow": -2 },
+      { "kind": "episodic", "text": "Plans to irrigate wheat.", "daysFromNow": 2, "isPlanned": true }
+    ],
+    "goal": "Decide whether to irrigate the wheat this week and whether to sell stored mustard now."
+  },
+  {
+    "id": "sunita",
+    "name": "Sunita",
+    "language": "en",
+    "description": "Onion and tomato grower near Nashik, Maharashtra, 1.5 acres on drip irrigation, also keeps 2 dairy cows.",
+    "memories": [
+      { "kind": "semantic", "key": "state", "value": "maharashtra", "text": "Farms in Maharashtra." },
+      { "kind": "semantic", "key": "district", "value": "nashik", "text": "Farm is in Nashik district." },
+      { "kind": "semantic", "key": "crop", "value": "onion", "text": "Grows onion." },
+      { "kind": "semantic", "key": "crop", "value": "tomato", "text": "Grows tomato." },
+      { "kind": "semantic", "key": "land_size", "value": "1.5 acres", "text": "Has 1.5 acres of land." },
+      { "kind": "semantic", "key": "irrigation", "value": "drip", "text": "Uses drip irrigation." },
+      { "kind": "semantic", "key": "livestock", "value": "cows", "text": "Keeps 2 dairy cows." },
+      { "kind": "episodic", "text": "Harvested onion and stored it.", "daysFromNow": -10 }
+    ],
+    "goal": "Find out whether onion prices are good enough to sell, and what support exists for her dairy cows."
+  },
+  {
+    "id": "gurpreet",
+    "name": "Gurpreet",
+    "language": "en",
+    "description": "Larger farmer in Ludhiana, Punjab. Paddy then wheat rotation on 10 acres, owns a tractor, interested in machinery subsidies.",
+    "memories": [
+      { "kind": "semantic", "key": "state", "value": "punjab", "text": "Farms in Punjab." },
+      { "kind": "semantic", "key": "district", "value": "ludhiana", "text": "Farm is in Ludhiana district." },
+      { "kind": "semantic", "key": "crop", "value": "paddy", "text": "Grows paddy." },
+      { "kind": "semantic", "key": "crop", "value": "wheat", "text": "Grows wheat." },
+      { "kind": "semantic", "key": "land_size", "value": "10 acres", "text": "Has 10 acres of land." },
+      { "kind": "semantic", "key": "equipment", "value": "tractor", "text": "Owns a tractor." },
+      { "kind": "episodic", "text": "Sowed wheat after paddy harvest.", "daysFromNow": -6 }
+    ],
+    "goal": "Learn about subsidies for farm machinery and whether to apply fertiliser before rain."
+  },
+  {
+    "id": "kamla",
+    "name": "Kamla",
+    "language": "hi",
+    "description": "Paddy grower near Raipur, Chhattisgarh with 1 acre of rain-fed land. Prefers Hindi and asks simple questions.",
+    "memories": [
+      { "kind": "semantic", "key": "state", "value": "chhattisgarh", "text": "Farms in Chhattisgarh." },
+      { "kind": "semantic", "key": "district", "value": "raipur", "text": "Farm is in Raipur district." },
+      { "kind": "semantic", "key": "crop", "value": "paddy", "text": "Grows paddy." },
+      { "kind": "semantic", "key": "land_size", "value": "1 acre", "text": "Has 1 acre of land." },
+      { "kind": "semantic", "key": "irrigation", "value": "rainfed", "text": "Land is rain-fed." },
+      { "kind": "semantic", "key": "preferred_language", "value": "hindi", "text": "Prefers Hindi." }
+    ],
+    "goal": "Find income support and crop insurance schemes she qualifies for, and the paddy price."
+  }
+]
