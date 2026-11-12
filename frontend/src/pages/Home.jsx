@@ -4,9 +4,10 @@ import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import WeatherCard from "../components/WeatherCard";
 import Footer from "../components/Footer";
+import { getAgriNews } from "../services/newsService";
 
 const Home = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [weatherData, setWeatherData] = useState({
     temp: 28,
     condition: "Sunny",
@@ -20,48 +21,52 @@ const Home = () => {
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState(null);
 
+  // News comes from the backend, which holds the NewsData.io key and
+  // returns Hindi articles (or translated headlines) when the UI is in Hindi.
+  const newsLang = i18n.language?.startsWith("hi") ? "hi" : "en";
   useEffect(() => {
+    let cancelled = false;
     const fetchNews = async () => {
-      const apiKey = import.meta.env.VITE_NEWSDATA_API_KEY;
-      if (!apiKey || apiKey === "your_newsdata_api_key_here") {
-        setNewsError("News API key not configured.");
-        setNewsLoading(false);
-        return;
-      }
+      setNewsLoading(true);
+      setNewsError(null);
       try {
-        const res = await fetch(
-          `https://newsdata.io/api/1/news?apikey=${apiKey}&q=agriculture+farming+crop&country=in&language=en&category=business,science&size=6`
-        );
-        const data = await res.json();
-        if (data.status === "success" && data.results?.length > 0) {
+        const data = await getAgriNews(newsLang);
+        if (cancelled) return;
+        if (data.items?.length > 0) {
           setNewsItems(
-            data.results.map((article) => ({
-              id: article.article_id,
+            data.items.map((article) => ({
+              id: article.id || article.link,
               title: article.title,
-              date: article.pubDate
-                ? new Date(article.pubDate).toLocaleDateString("en-IN", {
+              date: article.date
+                ? new Date(article.date).toLocaleDateString(newsLang === "hi" ? "hi-IN" : "en-IN", {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
                   })
-                : "Recent",
-              image: article.image_url || null,
+                : t("home.recent"),
+              image: article.image || null,
               url: article.link || "#",
-              source: article.source_name || "",
+              source: article.source || "",
+              translated: article.translatedFrom === "en",
             }))
           );
         } else {
-          setNewsError("No agriculture news found at the moment.");
+          setNewsItems([]);
+          setNewsError(t("home.newsNotFound"));
         }
       } catch (err) {
+        if (cancelled) return;
         console.error("News fetch error:", err);
-        setNewsError("Failed to load news. Please try again later.");
+        setNewsError(err.response?.status === 503 ? t("home.newsNoKey") : t("home.newsError"));
       } finally {
-        setNewsLoading(false);
+        if (!cancelled) setNewsLoading(false);
       }
     };
     fetchNews();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [newsLang, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
@@ -292,6 +297,11 @@ const Home = () => {
                     {item.source && (
                       <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
                         {item.source}
+                      </span>
+                    )}
+                    {item.translated && (
+                      <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full" title={t("home.translatedNews")}>
+                        {t("home.translatedBadge")}
                       </span>
                     )}
                   </div>

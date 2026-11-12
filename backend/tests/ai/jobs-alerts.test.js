@@ -108,6 +108,21 @@ test("farmer crop names resolve to mandi commodities", () => {
   assert.equal(recordMatchesCommodity("Paddy(Dhan)(Common)", "dhan"), true);
   assert.equal(recordMatchesCommodity("Bengal Gram(Gram)(Whole)", "chana"), true);
   assert.equal(recordMatchesCommodity("Wheat", "rice"), false);
+  // Whole-word matching and exclusions (live Agmarknet names)
+  assert.equal(recordMatchesCommodity("Turnip", "arhar"), false);
+  assert.equal(recordMatchesCommodity("Turmeric", "tur"), false);
+  assert.equal(recordMatchesCommodity("Red gram/Arhar/Tur(whole)", "tur"), true);
+  assert.equal(recordMatchesCommodity("Pegeon Pea(Arhar Fali)", "arhar"), false);
+  assert.equal(recordMatchesCommodity("Green Gram(Moong)(Whole)", "chana"), false);
+  assert.equal(recordMatchesCommodity("Black Gram(Urd Beans)(Whole)", "urad"), true);
+  assert.equal(recordMatchesCommodity("Black Gram Dal(Urd Dal)", "urad"), false);
+  assert.equal(recordMatchesCommodity("Bengal Gram Dal(Chana Dal)", "chana dal"), true);
+  assert.equal(recordMatchesCommodity("Bengal Gram(Gram)(Whole)", "chana dal"), false);
+  assert.equal(recordMatchesCommodity("Sweet Potato", "aloo"), false);
+  assert.equal(recordMatchesCommodity("Onion Green", "onion"), false);
+  assert.equal(recordMatchesCommodity("Paddy(Basmati)", "dhan"), false);
+  assert.equal(recordMatchesCommodity("Paddy(Basmati)", "basmati"), true);
+  assert.equal(recordMatchesCommodity("Mustard Oil", "sarson"), false);
 });
 
 test("mandi records are summarised for the requested crop only", () => {

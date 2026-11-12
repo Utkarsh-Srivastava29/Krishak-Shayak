@@ -10,7 +10,8 @@
     "test:ai": "node --test \"tests/ai/*.test.js\"",
     "rag:ingest": "node scripts/ingestKnowledge.js",
     "jobs:schedule": "node scripts/setupQstashSchedules.js",
-    "eval": "node eval/runEval.js"
+    "eval": "node eval/runEval.js",
+    "test:payment": "node --test tests/payment.test.js"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.1127.0",
@@ -27,6 +28,7 @@
     "mongoose": "^7.0.3",
     "nodemailer": "^10.0.0",
     "papaparse": "^5.7.0",
+    "razorpay": "^2.9.8",
     "redis": "^6.2.1",
     "ua-parser-js": "^2.0.10"
   },

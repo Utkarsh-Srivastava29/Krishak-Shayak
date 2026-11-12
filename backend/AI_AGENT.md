@@ -9,6 +9,7 @@ Farmer ──SSE──► /api/chat ──► ReAct agent loop (Gemini function 
                                  ├── get_mandi_prices       data.gov.in Agmarknet (+ own price history)
                                  ├── search_knowledge       Hybrid RAG over the scheme catalogue
                                  ├── get_soil_moisture      Open-Meteo
+                                 ├── recommend_crops        crop calendar + forecast + soil + mandi prices
                                  ├── search_marketplace     MongoDB products
                                  ├── add_to_cart            ┐ write actions: proposed only,
                                  └── log_farm_activity      ┘ executed after the farmer taps Confirm
@@ -127,14 +128,14 @@ npm run eval -- --resume eval/results/eval-<time>.json
 
 ## Setup checklist
 
-**On the EC2 deployment** this is automatic. Add a `GEMINI_API_KEY` repository secret, and the deploy workflow writes it to the server's `.env`, sets `JOB_SCHEDULER=bullmq` and runs `rag:ingest`. For a manual or other setup:
+**On the EC2 deployment** this is automatic. Add a `GEMINI_API_KEY` repository secret (plus `NEWSDATA_API_KEY` and the `RAZORPAY_*` secrets for news and payments), and the deploy workflow writes them to the server's `.env`, sets `JOB_SCHEDULER=bullmq` and runs `rag:ingest`. For a manual or other setup:
 
 
 1. `npm install` in `backend/`. This adds `bullmq`.
 2. In `.env`, set `GEMINI_API_KEY`, `MONGODB_URI`, `REDIS_URL` and `OPENWEATHER_API_KEY`, then the new section of `.env.example`.
 3. `npm run rag:ingest` builds the knowledge base. Re-run it whenever the scheme sheet changes.
 4. On Render free tier: create a free Upstash QStash project and set `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` and `PUBLIC_API_URL`. Then run `npm run jobs:schedule` once.
-5. `npm run test:ai` runs the 36 unit tests for the agent loop, actions, RAG, memory, jobs, alerts and SSE. They need no network.
+5. `npm run test:ai` runs the 57 unit tests for the agent loop, actions, RAG, memory, jobs, alerts, SSE, crop recommendations, news, Hindi translation and the weather proxy. `npm run test:payment` runs the 12 payment tests. None need the network.
 6. `npm run eval` runs the evaluation.
 
 ## Free tiers used

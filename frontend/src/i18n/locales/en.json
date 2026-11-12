@@ -1,6 +1,7 @@
 {
   "navbar": {
     "home": "Home",
+    "cropAdvice": "Crop Advice",
     "marketplace": "Market Place",
     "marketPrice": "Market Price",
     "weather": "Weather",
@@ -34,6 +35,9 @@
     "feature4Title": "Buy & Sell Products",
     "feature4Desc": "Connect directly with buyers and sellers in our farmer-friendly marketplace",
     "latestNews": "Latest Agricultural News",
+    "recent": "Recent",
+    "translatedBadge": "Translated",
+    "translatedNews": "Translated from English",
     "readMore": "Read More →",
     "newsError": "Failed to load news. Please try again later.",
     "newsNoKey": "News API key not configured.",
@@ -418,5 +422,79 @@
     "empty": "No alerts yet. Alerts appear when weather or prices may affect your crops.",
     "markRead": "Mark as read",
     "manageMemory": "Manage what the assistant remembers"
+  },
+  "crops": {
+    "title": "Crop Recommendation",
+    "subtitle": "Crops you can sow now, ranked using the live weather forecast, soil moisture, the crop calendar and today's mandi prices.",
+    "placeholder": "Village, town or district, e.g. Etawah",
+    "button": "Recommend crops",
+    "empty": "Enter your place to see which crops suit your field this month.",
+    "error": "Could not load recommendations. Please try again.",
+    "notFound": "We could not find that place. Try the nearest town or district.",
+    "needLocation": "Please enter your village, town or district.",
+    "none": "No crops are in their sowing window for this month and the next.",
+    "sowNow": "Sow now",
+    "sowNextMonth": "Sow next month",
+    "suitability": "Suitability",
+    "waterNeed": "Water need",
+    "duration": "{{min}}–{{max}} days",
+    "mandiPrice": "Today's mandi price",
+    "quintal": "quintal",
+    "mandiMeta": "Average of {{markets}} markets · {{date}}",
+    "noMandi": "No mandi price reported today in your state.",
+    "avgTemp": "Avg temp (5 days)",
+    "rain5d": "Rain (next 5 days)",
+    "soilMoisture": "Soil moisture",
+    "currentTemp": "Now",
+    "personalised": "Personalised with your farm details: {{details}}",
+    "profile": {
+      "state": "State",
+      "irrigation": "Irrigation",
+      "soil": "Soil"
+    },
+    "sources": "Sources: {{sources}}.",
+    "disclaimer": "Sowing windows vary by zone; confirm varieties and dates with your local KVK.",
+    "water": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "moisture": {
+      "low": "Dry",
+      "moderate": "Good",
+      "high": "Wet"
+    },
+    "season": {
+      "rabi": "Rabi",
+      "kharif": "Kharif",
+      "zaid": "Zaid",
+      "summer": "Summer",
+      "annual": "Annual",
+      "all seasons": "All seasons"
+    },
+    "soil": {
+      "loam": "loam",
+      "clay loam": "clay loam",
+      "sandy loam": "sandy loam",
+      "clay": "clay",
+      "sandy": "sandy",
+      "black": "black",
+      "red": "red",
+      "alluvial": "alluvial"
+    },
+    "reason": {
+      "sow_now": "Sowing window is open now ({{season}})",
+      "sow_next_month": "Sowing window opens next month ({{season}}) — prepare the field",
+      "temp_ok": "Forecast average {{avgTemp}}°C suits it ({{min}}–{{max}}°C)",
+      "temp_cool": "Forecast {{avgTemp}}°C is cooler than ideal ({{min}}–{{max}}°C)",
+      "temp_hot": "Forecast {{avgTemp}}°C is hotter than ideal ({{min}}–{{max}}°C)",
+      "water_ok": "Enough water for its {{need}} need",
+      "water_needs_irrigation": "{{need}} water need: plan irrigation",
+      "water_short": "{{need}} water need is risky without reliable irrigation",
+      "region_major": "A major crop in {{state}}",
+      "soil_match": "Suits your {{soil}} soil",
+      "soil_mismatch": "Not ideal for {{soil}} soil",
+      "you_grow": "You have grown this before"
+    }
   }
 }

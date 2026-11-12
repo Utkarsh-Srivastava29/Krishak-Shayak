@@ -132,6 +132,34 @@ const toolSpecs = {
     },
   },
 
+  recommend_crops: {
+    status: { en: "Working out which crops suit your field…", hi: "आपके खेत के लिए उपयुक्त फसलें देख रहा हूँ…" },
+    declaration: {
+      name: "recommend_crops",
+      description:
+        "Rank crops the farmer can sow now or next month at a place, using the crop calendar, the live 5-day weather forecast, soil moisture, the farmer's irrigation and soil (from memory) and today's mandi prices. Use for 'what should I sow / which crop is best now' questions.",
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          location: { type: Type.STRING, description: "Town or district. Leave empty for the saved district." },
+          limit: { type: Type.INTEGER, description: "How many crops to return (1-6). Default 4." },
+        },
+      },
+    },
+    handler: async (args, ctx) => {
+      const location = defaultLocation(args, ctx);
+      if (!location) return { error: "Location unknown. Ask the farmer for their district." };
+      const { getCropRecommendations } = require("../services/cropRecommendationService");
+      const limit = Math.min(Math.max(parseInt(args.limit, 10) || 4, 1), 6);
+      const result = await getCropRecommendations({ location, profile: ctx.profile || {}, limit, deps: ctx.deps || {} });
+      if (!result) return { error: `Could not find the place "${location}".` };
+      return {
+        ...result,
+        recommendations: result.recommendations.map((r) => ({ ...r, reasons: r.reasons.map((x) => x.code) })),
+      };
+    },
+  },
+
   search_marketplace: {
     status: { en: "Searching the marketplace…", hi: "बाज़ार में खोज रहा हूँ…" },
     declaration: {

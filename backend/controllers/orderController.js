@@ -16,6 +16,15 @@ exports.createOrder = async (req, res) => {
       total,
     });
 
+    // Online payments must go through /api/payments so the amount is priced
+    // server-side and the Razorpay signature is verified. This endpoint only
+    // creates cash-on-delivery orders, which are never marked paid here.
+    if (paymentMethod && paymentMethod !== "cash") {
+      return res.status(400).json({
+        message: "Online payments must be initiated via /api/payments/create-order",
+      });
+    }
+
     // Validate required fields
     if (!items || items.length === 0) {
       return res
@@ -70,7 +79,9 @@ exports.createOrder = async (req, res) => {
       buyer: req.user.id,
       items: sanitizedItems,
       shippingAddress,
-      paymentMethod: paymentMethod || "cash",
+      paymentMethod: "cash",
+      paymentStatus: "pending",
+      payment: { provider: "cod" },
       subtotal: parseFloat(subtotal),
       shipping: parseFloat(shipping) || 0,
       total: parseFloat(total),

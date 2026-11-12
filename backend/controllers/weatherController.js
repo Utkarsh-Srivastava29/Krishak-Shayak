@@ -253,3 +253,53 @@ Base soil advice on the measured soil moisture, not on humidity — they are dif
     });
   }
 };
+
+// ---------------------------------------------------------------------------
+// OpenWeatherMap proxy: lets the frontend keep its existing response shapes
+// without shipping the API key in the browser bundle. Only three upstream
+// endpoints and a fixed set of parameters are allowed.
+// ---------------------------------------------------------------------------
+const OWM_ENDPOINTS = {
+  geo: "https://api.openweathermap.org/geo/1.0/direct",
+  current: `${BASE_URL}/weather`,
+  forecast: `${BASE_URL}/forecast`,
+};
+
+/** Validate and whitelist query params; returns null if invalid. */
+const owmParams = (endpoint, query) => {
+  if (endpoint === "geo") {
+    const q = typeof query.q === "string" ? query.q.trim() : "";
+    const limit = Math.min(Math.max(parseInt(query.limit, 10) || 1, 1), 5);
+    return q && q.length <= 100 ? { q, limit } : null;
+  }
+  const lat = Number(query.lat);
+  const lon = Number(query.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+  return { lat, lon, units: "metric" };
+};
+
+// @route   GET /api/weather/owm/:endpoint   (geo | current | forecast)
+// @access  Public, rate-limited and cached
+exports.proxyOpenWeather = async (req, res) => {
+  const url = OWM_ENDPOINTS[req.params.endpoint];
+  if (!url) return res.status(404).json({ message: "Unknown weather endpoint" });
+  const params = owmParams(req.params.endpoint, req.query);
+  if (!params) return res.status(400).json({ message: "Invalid weather query" });
+  if (!process.env.OPENWEATHER_API_KEY) {
+    return res.status(503).json({ message: "Weather is not configured on the server" });
+  }
+  try {
+    const { data } = await axios.get(url, {
+      params: { ...params, appid: process.env.OPENWEATHER_API_KEY },
+      timeout: 10000,
+    });
+    res.json(data);
+  } catch (error) {
+    const status = error.response?.status;
+    console.error(`OpenWeather proxy (${req.params.endpoint}) error:`, error.message);
+    // Pass through "not found"; hide upstream auth/quota details
+    res.status(status === 404 ? 404 : 502).json({ message: "Weather service unavailable" });
+  }
+};
+
+exports._owmParams = owmParams; // for tests

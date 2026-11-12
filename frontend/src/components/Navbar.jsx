@@ -92,6 +92,7 @@ const Navbar = () => {
             <Link to="/marketplace" className="text-white hover:text-yellow-300 transition">{t('navbar.marketplace')}</Link>
             <Link to="/market-price" className="text-white hover:text-yellow-300 transition">{t('navbar.marketPrice')}</Link>
             <Link to="/weather" className="text-white hover:text-yellow-300 transition">{t('navbar.weather')}</Link>
+            <Link to="/crop-recommendation" className="text-white hover:text-yellow-300 transition">{t('navbar.cropAdvice')}</Link>
             <Link to="/govt-schemes" className="text-white hover:text-yellow-300 transition">{t('navbar.govtSchemes')}</Link>
             {isAuthenticated && user?.userType === "seller" && (
               <Link to="/seller-dashboard" className="text-white hover:text-yellow-300 transition">{t('navbar.dashboard')}</Link>
@@ -230,6 +231,7 @@ const Navbar = () => {
             <Link to="/marketplace" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.marketplace')}</Link>
             <Link to="/market-price" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.marketPrice')}</Link>
             <Link to="/weather" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.weather')}</Link>
+            <Link to="/crop-recommendation" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.cropAdvice')}</Link>
             <Link to="/govt-schemes" className="block py-2 text-white hover:bg-green-600 px-4 rounded" onClick={() => setIsMenuOpen(false)}>{t('navbar.govtSchemes')}</Link>
 
             {isAuthenticated && user?.userType === "seller" && (

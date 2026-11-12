@@ -17,6 +17,9 @@ const healthRoutes = require("./routes/healthRoutes");
 const memoryRoutes = require("./routes/memoryRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const jobRoutes = require("./routes/jobRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const cropRoutes = require("./routes/cropRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 const { startWorker, registerBullSchedules } = require("./jobs/queue");
 const { connectRedis } = require("./config/redisClient");
 
@@ -62,9 +65,12 @@ app.use(
 app.use(
   express.json({
     limit: "50mb",
-    // Keep the exact bytes: QStash signs the raw body of job requests.
+    // Keep the exact bytes for HMAC checks: QStash signs job requests and
+    // Razorpay signs webhooks over the raw body.
     verify: (req, res, buf) => {
-      if (req.originalUrl.startsWith("/api/jobs/")) req.rawBody = buf;
+      if (req.originalUrl.startsWith("/api/jobs/") || req.originalUrl === "/api/payments/webhook") {
+        req.rawBody = buf;
+      }
     },
   })
 );
@@ -96,6 +102,9 @@ app.use("/api/health", healthRoutes);
 app.use("/api/memory", memoryRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/crops", cropRoutes);
+app.use("/api/news", newsRoutes);
 
 // Basic route for testing
 app.get("/", (req, res) => {

@@ -13,6 +13,7 @@ const ALL_TOOLS = [
   "get_mandi_prices",
   "search_knowledge",
   "get_soil_moisture",
+  "recommend_crops",
   "search_marketplace",
   "add_to_cart",
   "log_farm_activity",

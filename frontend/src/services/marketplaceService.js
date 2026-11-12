@@ -507,6 +507,30 @@ export const placeOrder = async (orderData) => {
   }
 };
 
+const postJson = async (path, body, fallbackMessage) => {
+  const response = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || fallbackMessage);
+  return data;
+};
+
+/**
+ * Start an online payment. The server prices the cart from the database and
+ * returns a Razorpay order id + public key id for Checkout.
+ */
+export const createPaymentOrder = ({ items, shippingAddress, paymentMethod }) =>
+  postJson("/payments/create-order", { items, shippingAddress, paymentMethod }, "Failed to initiate payment");
+
+/**
+ * Send the Checkout response to the server for signature verification.
+ */
+export const verifyPayment = (razorpayResponse) =>
+  postJson("/payments/verify", razorpayResponse, "Payment verification failed");
+
 /**
  * Get all orders for the authenticated user
  */

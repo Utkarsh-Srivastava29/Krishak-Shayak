@@ -52,6 +52,18 @@ jobs:
           if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
             PARAMS+=("GeminiAPIKey=${{ secrets.GEMINI_API_KEY }}")
           fi
+          if [ -n "${{ secrets.NEWSDATA_API_KEY }}" ]; then
+            PARAMS+=("NewsDataAPIKey=${{ secrets.NEWSDATA_API_KEY }}")
+          fi
+          if [ -n "${{ secrets.RAZORPAY_KEY_ID }}" ]; then
+            PARAMS+=("RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }}")
+          fi
+          if [ -n "${{ secrets.RAZORPAY_KEY_SECRET }}" ]; then
+            PARAMS+=("RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}")
+          fi
+          if [ -n "${{ secrets.RAZORPAY_WEBHOOK_SECRET }}" ]; then
+            PARAMS+=("RazorpayWebhookSecret=${{ secrets.RAZORPAY_WEBHOOK_SECRET }}")
+          fi
           if [ -n "${{ secrets.SCHEMES_SHEET_URL }}" ]; then
             PARAMS+=("SchemesSheetURL=${{ secrets.SCHEMES_SHEET_URL }}")
           fi
