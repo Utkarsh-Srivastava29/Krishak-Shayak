@@ -32,6 +32,22 @@ jobs:
     name: Deploy backend + frontend
     runs-on: ubuntu-latest
     steps:
+      - name: Check deploy secrets
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          missing=""
+          [ -n "$EC2_HOST" ] || missing="$missing EC2_HOST"
+          [ -n "$EC2_SSH_KEY" ] || missing="$missing EC2_SSH_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error title=Deploy secrets missing::Add these repository secrets in Settings > Secrets and variables > Actions:$missing. EC2_HOST is the server address (e.g. krishakshayak.duckdns.org); EC2_SSH_KEY is the full text of the server's .pem private key."
+            exit 1
+          fi
+          [ -n "$GEMINI_API_KEY" ] || echo "::warning title=GEMINI_API_KEY not set::The AI assistant needs GEMINI_API_KEY, either as a repository secret or already in the server's backend .env."
+          echo "Deploy secrets present."
+
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1
         env:
