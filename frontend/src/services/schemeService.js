@@ -1,9 +1,10 @@
 import axios from "axios";
 import { API_URL } from "./api";
 
-export const getAllSchemes = async () => {
+// lang=hi returns Hindi translations of the (English-only) scheme sheet
+export const getAllSchemes = async (lang = "en") => {
   try {
-    const response = await axios.get(`${API_URL}/schemes`);
+    const response = await axios.get(`${API_URL}/schemes`, { params: lang === "hi" ? { lang } : {} });
     return response.data;
   } catch (error) {
     console.error("Error fetching schemes from backend:", error);

@@ -5,7 +5,8 @@ import Footer from "../components/Footer";
 import { getAllSchemes } from "../services/schemeService";
 
 const GovtSchemes = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const schemeLang = i18n.language?.startsWith("hi") ? "hi" : "en";
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [expandedScheme, setExpandedScheme] = useState(null);
@@ -19,7 +20,10 @@ const GovtSchemes = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await getAllSchemes();
+        const data = await getAllSchemes(schemeLang);
+        // Department names are translated too, so a filter chosen in the
+        // other language would match nothing
+        setSelectedDepartment("");
         setSchemes(data); // Schemes are already in sheet order
       } catch (err) {
         setError(err.message);
@@ -29,7 +33,7 @@ const GovtSchemes = () => {
     };
 
     fetchSchemes();
-  }, []);
+  }, [schemeLang]);
 
   // Get unique departments
   const departments = [...new Set(schemes.map((scheme) => scheme.department))];
