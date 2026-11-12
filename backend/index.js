@@ -19,6 +19,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const cropRoutes = require("./routes/cropRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 const { startWorker, registerBullSchedules } = require("./jobs/queue");
 const { connectRedis } = require("./config/redisClient");
 
@@ -103,6 +104,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/crops", cropRoutes);
+app.use("/api/news", newsRoutes);
 
 // Basic route for testing
 app.get("/", (req, res) => {
