@@ -1,0 +1,60 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Backend to EC2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GEMINI_API_KEY,NEWSDATA_API_KEY,RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET,RAZORPAY_WEBHOOK_SECRET
+          script: |
+            echo "========================================="
+            echo ">>> Pulling latest backend code..."
+            echo "========================================="
+            cd /home/ubuntu/Krishak_Shayak_Backend
+            git fetch origin main
+            git reset --hard origin/main
+            npm install --production=false
+
+            # Keep the server .env in sync with repository secrets (only the
+            # secrets that are set are written; nothing else is touched).
+            set_env() {
+              touch .env
+              if grep -q "^$1=" .env; then sed -i "s|^$1=.*|$1=$2|" .env; else echo "$1=$2" >> .env; fi
+            }
+            add_env_if_missing() { grep -q "^$1=" .env 2>/dev/null || echo "$1=$2" >> .env; }
+            if [ -n "$GEMINI_API_KEY" ]; then set_env GEMINI_API_KEY "$GEMINI_API_KEY"; fi
+            if [ -n "$NEWSDATA_API_KEY" ]; then set_env NEWSDATA_API_KEY "$NEWSDATA_API_KEY"; fi
+            if [ -n "$RAZORPAY_KEY_ID" ]; then set_env RAZORPAY_KEY_ID "$RAZORPAY_KEY_ID"; fi
+            if [ -n "$RAZORPAY_KEY_SECRET" ]; then set_env RAZORPAY_KEY_SECRET "$RAZORPAY_KEY_SECRET"; fi
+            if [ -n "$RAZORPAY_WEBHOOK_SECRET" ]; then set_env RAZORPAY_WEBHOOK_SECRET "$RAZORPAY_WEBHOOK_SECRET"; fi
+            add_env_if_missing JOB_SCHEDULER bullmq
+            add_env_if_missing VECTOR_SEARCH_MODE local
+
+            # Refresh the RAG knowledge base; unchanged documents are skipped
+            if grep -q '^GEMINI_API_KEY=.\+' .env; then
+              npm run rag:ingest || echo "WARNING: rag:ingest failed; the assistant falls back to keyword search."
+            fi
+
+            echo ">>> Restarting backend process with PM2..."
+            pm2 restart krishak-backend || pm2 start index.js --name "krishak-backend"
+            pm2 save
+
+            echo ">>> Backend deployed successfully!"
+            pm2 status

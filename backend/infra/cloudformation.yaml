@@ -49,7 +49,7 @@ Parameters:
     Type: String
     NoEcho: true
     Default: ''
-    Description: 'Google Gemini API key for the AI assistant (free at aistudio.google.com/apikey)'
+    Description: 'Google Gemini API key for the AI assistant, RAG and translation (aistudio.google.com/apikey)'
 
   NewsDataAPIKey:
     Type: String
@@ -205,13 +205,8 @@ Resources:
           # ──────────────────────────────────
           echo ">>> Setting up Backend..."
           cd /home/ubuntu
-          # Monorepo: backend/ and frontend/ are copied into the folders that
-          # PM2 and nginx use. .github/workflows/deploy.yml keeps them updated.
-          rm -rf Krishak-Shayak Krishak_Shayak_Backend Krishak_Shayak_Frontend
-          sudo -u ubuntu git clone --depth 50 https://github.com/Utkarsh-Srivastava29/Krishak-Shayak.git
-          sudo -u ubuntu cp -r Krishak-Shayak/backend Krishak_Shayak_Backend
-          sudo -u ubuntu cp -r Krishak-Shayak/frontend Krishak_Shayak_Frontend
-          sudo -u ubuntu git -C Krishak-Shayak rev-parse HEAD > Krishak-Shayak/.deployed-sha
+          rm -rf Krishak_Shayak_Backend
+          sudo -u ubuntu git clone https://github.com/Webdevproject123/Krishak_Shayak_Backend.git
           cd Krishak_Shayak_Backend
 
           sudo -u ubuntu cat > .env << 'ENVEOF'
@@ -248,7 +243,10 @@ Resources:
           # FRONTEND SETUP
           # ──────────────────────────────────
           echo ">>> Setting up Frontend..."
-          cd /home/ubuntu/Krishak_Shayak_Frontend
+          cd /home/ubuntu
+          rm -rf Krishak_Shayak_Frontend
+          sudo -u ubuntu git clone https://github.com/Webdevproject123/Krishak_Shayak_Frontend.git
+          cd Krishak_Shayak_Frontend
 
           sudo -u ubuntu cat > .env << FENVEOF
           VITE_API_URL=/api
