@@ -5,7 +5,16 @@ const {
   getWeather,
   getHourlyForecast,
   getWeatherInsights,
+  proxyOpenWeather,
 } = require("../controllers/weatherController");
+const { createRateLimiter } = require("../middleware/rateLimiter");
+
+// The proxy is cheap per call but public: 60 burst per IP, 1 per second refill
+const owmRateLimiter = createRateLimiter({
+  keyPrefix: "rl:owm",
+  limits: [{ type: "ip", capacity: 60, refillRate: 1 }],
+  identifierExtractor: (req) => ({ ip: req.ip }),
+});
 
 // TTL: 15 minutes (900 seconds) — weather changes moderately
 const WEATHER_TTL = 900;
@@ -30,5 +39,9 @@ router.get(
   ),
   getWeatherInsights
 );
+
+// GET /api/weather/owm/:endpoint  (geo | current | forecast)
+// Server-side OpenWeatherMap access for the browser; 10-minute cache
+router.get("/owm/:endpoint", owmRateLimiter, cacheMiddleware("owm", 600), proxyOpenWeather);
 
 module.exports = router;
