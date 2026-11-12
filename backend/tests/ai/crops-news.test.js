@@ -69,6 +69,13 @@ test("dry rain-fed field prefers low-water crops; irrigation lifts wheat", () =>
   assert.ok(tubewell.wheat.reasons.some((r) => r.code === "water_ok"));
 });
 
+test("unknown irrigation is neutral but flags crops that need more water than the soil holds", () => {
+  const r = byCrop(scoreCrops({ month: 11, avgTemp: 18, rainMm: 0, soilMoisture: "low", state: "Punjab" }));
+  assert.equal(scoreCrops({ month: 11, avgTemp: 18, rainMm: 0, soilMoisture: "low", state: "Punjab" })[0].crop, "wheat");
+  assert.ok(r.wheat.reasons.some((x) => x.code === "water_needs_irrigation"));
+  assert.ok(r.barley.reasons.some((x) => x.code === "water_ok"));
+});
+
 test("region and soil personalise the ranking", () => {
   const base = { month: 11, avgTemp: 20, soilMoisture: "moderate" };
   const up = byCrop(scoreCrops({ ...base, state: "Uttar Pradesh" }));
@@ -109,7 +116,8 @@ test("getCropRecommendations combines forecast, soil moisture and mandi prices",
   assert.equal(r.conditions.soilMoisture, "low");
   assert.equal(r.recommendations.length, 5);
   const crops = byCrop(r.recommendations);
-  assert.equal(crops.mustard.mandi.averageModalPrice, 5640); // from the data.gov.in fixture
+  assert.equal(crops.wheat.mandi.averageModalPrice, 2450); // from the data.gov.in fixture
+  assert.equal(crops.potato.mandi, null); // no fixture price -> null, not a guess
   assert.ok(r.sources.includes("OpenWeatherMap"));
   assert.equal(await getCropRecommendations({ location: "Atlantis", deps: fixtureDeps }), null);
 });

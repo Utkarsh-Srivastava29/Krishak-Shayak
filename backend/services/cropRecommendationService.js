@@ -75,15 +75,18 @@ const scoreCrops = ({ month, avgTemp, rainMm = 0, soilMoisture = null, profile =
   const nextMonth = (month % 12) + 1;
   const grows = new Set((profile.crops || []).map((c) => c.toString().toLowerCase()));
 
-  // Water available to the crop: irrigation beats everything; otherwise soil
-  // moisture, raised one step by meaningful forecast rain.
+  // Water from the field itself: soil moisture, raised one step by
+  // meaningful forecast rain.
+  let natural = soilMoisture in SOIL_LEVEL ? SOIL_LEVEL[soilMoisture] : 1;
+  if (rainMm >= 25) natural = Math.min(2, natural + 1);
+  // Water the crop can get: irrigated farms can meet any need; rain-fed
+  // farms only what the field provides (never "reliably wet"); when we don't
+  // know, assume some irrigation (most rabi area is irrigated) and add a
+  // caution below instead of a penalty.
   let available;
   if (irrigated === 2) available = 2;
-  else {
-    available = soilMoisture in SOIL_LEVEL ? SOIL_LEVEL[soilMoisture] : 1;
-    if (rainMm >= 25) available = Math.min(2, available + 1);
-    if (irrigated === 0) available = Math.min(available, 1); // rain-fed: never "reliably wet"
-  }
+  else if (irrigated === 0) available = Math.min(natural, 1);
+  else available = Math.max(natural, 1);
 
   const results = [];
   for (const crop of crops) {
@@ -118,7 +121,8 @@ const scoreCrops = ({ month, avgTemp, rainMm = 0, soilMoisture = null, profile =
     const deficit = LEVEL[crop.water] - available;
     if (deficit <= 0) {
       score += WEIGHTS.water;
-      reasons.push({ code: "water_ok", params: { need: crop.water } });
+      const relyOnIrrigation = irrigated === null && LEVEL[crop.water] > natural;
+      reasons.push({ code: relyOnIrrigation ? "water_needs_irrigation" : "water_ok", params: { need: crop.water } });
     } else if (deficit === 1) {
       score += WEIGHTS.water / 2;
       reasons.push({ code: "water_needs_irrigation", params: { need: crop.water } });
@@ -126,11 +130,13 @@ const scoreCrops = ({ month, avgTemp, rainMm = 0, soilMoisture = null, profile =
       reasons.push({ code: "water_short", params: { need: crop.water } });
     }
 
-    // Region
+    // Region: states are listed roughly by production, so the top three
+    // producers get full weight and other growing states a little less.
+    let regionRank = -1;
     if (farmState) {
-      const major = crop.states.some((s) => sameState(s, farmState));
-      score += major ? WEIGHTS.region : WEIGHTS.region / 3;
-      if (major) reasons.push({ code: "region_major", params: { state: farmState } });
+      regionRank = crop.states.findIndex((s) => sameState(s, farmState));
+      score += regionRank === -1 ? WEIGHTS.region / 3 : regionRank < 3 ? WEIGHTS.region : WEIGHTS.region * 0.8;
+      if (regionRank !== -1) reasons.push({ code: "region_major", params: { state: farmState } });
     } else {
       score += WEIGHTS.region / 2;
     }
@@ -160,10 +166,13 @@ const scoreCrops = ({ month, avgTemp, rainMm = 0, soilMoisture = null, profile =
       sowNow: crop.sowingMonths.includes(month),
       score: Math.round(score),
       reasons,
+      _regionRank: regionRank === -1 ? 99 : regionRank,
     });
   }
 
-  return results.sort((a, b) => b.score - a.score || a.durationDays[0] - b.durationDays[0]);
+  return results
+    .sort((a, b) => b.score - a.score || a._regionRank - b._regionRank || a.durationDays[0] - b.durationDays[0])
+    .map(({ _regionRank, ...r }) => r); // eslint-disable-line no-unused-vars
 };
 
 /**
