@@ -49,13 +49,16 @@ jobs:
           if [ -n "${{ secrets.DATA_GOV_API_KEY }}" ]; then
             PARAMS+=("DataGovAPIKey=${{ secrets.DATA_GOV_API_KEY }}")
           fi
+          if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
+            PARAMS+=("GeminiAPIKey=${{ secrets.GEMINI_API_KEY }}")
+          fi
           if [ -n "${{ secrets.SCHEMES_SHEET_URL }}" ]; then
             PARAMS+=("SchemesSheetURL=${{ secrets.SCHEMES_SHEET_URL }}")
           fi
 
           echo "Deploying CloudFormation stack: ${{ env.STACK_NAME }}..."
           aws cloudformation deploy \
-            --template-file infra/cloudformation.yaml \
+            --template-file backend/infra/cloudformation.yaml \
             --stack-name ${{ env.STACK_NAME }} \
             --parameter-overrides "${PARAMS[@]}" \
             --no-fail-on-empty-changeset

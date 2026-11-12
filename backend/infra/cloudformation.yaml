@@ -45,6 +45,12 @@ Parameters:
     NoEcho: true
     Description: 'Data.gov.in API Key'
 
+  GeminiAPIKey:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: 'Google Gemini API key for the AI assistant (free at aistudio.google.com/apikey)'
+
   SchemesSheetURL:
     Type: String
     Description: 'Google Sheets CSV URL for schemes'
@@ -176,8 +182,13 @@ Resources:
           # ──────────────────────────────────
           echo ">>> Setting up Backend..."
           cd /home/ubuntu
-          rm -rf Krishak_Shayak_Backend
-          sudo -u ubuntu git clone https://github.com/Webdevproject123/Krishak_Shayak_Backend.git
+          # Monorepo: backend/ and frontend/ are copied into the folders that
+          # PM2 and nginx use. .github/workflows/deploy.yml keeps them updated.
+          rm -rf Krishak-Shayak Krishak_Shayak_Backend Krishak_Shayak_Frontend
+          sudo -u ubuntu git clone --depth 50 https://github.com/Utkarsh-Srivastava29/Krishak-Shayak.git
+          sudo -u ubuntu cp -r Krishak-Shayak/backend Krishak_Shayak_Backend
+          sudo -u ubuntu cp -r Krishak-Shayak/frontend Krishak_Shayak_Frontend
+          sudo -u ubuntu git -C Krishak-Shayak rev-parse HEAD > Krishak-Shayak/.deployed-sha
           cd Krishak_Shayak_Backend
 
           sudo -u ubuntu cat > .env << 'ENVEOF'
@@ -191,11 +202,16 @@ Resources:
           DATA_GOV_API_KEY=${DataGovAPIKey}
           SCHEMES_SHEET_URL=${SchemesSheetURL}
           FRONTEND_URL=*
+          GEMINI_API_KEY=${GeminiAPIKey}
+          JOB_SCHEDULER=bullmq
+          VECTOR_SEARCH_MODE=local
           ENVEOF
 
           sudo -u ubuntu npm install
           sudo -u ubuntu pm2 start index.js --name "krishak-backend"
           sudo -u ubuntu pm2 save
+          # Build the RAG knowledge base (needs GEMINI_API_KEY; safe to fail)
+          sudo -u ubuntu npm run rag:ingest || echo "rag:ingest skipped"
 
           # Configure PM2 startup on system boot
           env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
@@ -205,10 +221,7 @@ Resources:
           # FRONTEND SETUP
           # ──────────────────────────────────
           echo ">>> Setting up Frontend..."
-          cd /home/ubuntu
-          rm -rf Krishak_Shayak_Frontend
-          sudo -u ubuntu git clone https://github.com/Webdevproject123/Krishak_Shayak_Frontend.git
-          cd Krishak_Shayak_Frontend
+          cd /home/ubuntu/Krishak_Shayak_Frontend
 
           sudo -u ubuntu cat > .env << FENVEOF
           VITE_API_URL=/api

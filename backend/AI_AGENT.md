@@ -127,6 +127,9 @@ npm run eval -- --resume eval/results/eval-<time>.json
 
 ## Setup checklist
 
+**On the EC2 deployment** this is automatic. Add a `GEMINI_API_KEY` repository secret, and the deploy workflow writes it to the server's `.env`, sets `JOB_SCHEDULER=bullmq` and runs `rag:ingest`. For a manual or other setup:
+
+
 1. `npm install` in `backend/`. This adds `bullmq`.
 2. In `.env`, set `GEMINI_API_KEY`, `MONGODB_URI`, `REDIS_URL` and `OPENWEATHER_API_KEY`, then the new section of `.env.example`.
 3. `npm run rag:ingest` builds the knowledge base. Re-run it whenever the scheme sheet changes.

@@ -30,7 +30,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        working-directory: infra/monitoring
+        working-directory: backend/infra/monitoring
         run: npm install
 
       - name: Configure AWS Credentials
@@ -41,9 +41,9 @@ jobs:
           aws-region: ${{ github.event.inputs.aws_region || 'ap-south-1' }}
 
       - name: Bootstrap CDK
-        working-directory: infra/monitoring
+        working-directory: backend/infra/monitoring
         run: npx cdk bootstrap
 
       - name: Deploy Monitoring Stack
-        working-directory: infra/monitoring
+        working-directory: backend/infra/monitoring
         run: npx cdk deploy --require-approval never

@@ -285,11 +285,26 @@ Krishak-Shayak/
 
 ## Deployment
 
-- **Current setup:** GitHub Actions deploys `backend/` and `frontend/` to **AWS EC2** on every push to `main`. The backend runs under **PM2**. AWS infrastructure and the CloudWatch monitoring stack are deployed with CloudFormation and CDK workflows.
-- **Free-hosting alternative:** frontend on **Vercel** (`frontend/vercel.json`), backend on **Render** free tier.
-  - Render sleeps when idle, so set `JOB_SCHEDULER=qstash` and run `npm run jobs:schedule` once. QStash then wakes the server for the daily jobs.
-  - On an always-on server (EC2), use `JOB_SCHEDULER=bullmq` instead.
-- **After deploying the AI features:** run `npm run rag:ingest` once against the production database.
+**Automatic deploys (AWS EC2).** `.github/workflows/deploy.yml` runs on every push to `main` that changes `backend/` or `frontend/`. It connects to the server over SSH and then:
+
+1. Pulls this repo into `/home/ubuntu/Krishak-Shayak`.
+2. Copies `backend/` into `/home/ubuntu/Krishak_Shayak_Backend` (where PM2 runs the API) and `frontend/` into `/home/ubuntu/Krishak_Shayak_Frontend` (nginx serves its `dist/`). Each folder keeps its `.env` and `node_modules`.
+3. Backend: adds missing AI settings to `.env`, runs `npm install`, restarts PM2, refreshes the knowledge base with `npm run rag:ingest`, and checks the API is up.
+4. Frontend: runs `npm install` and `npm run build`.
+5. Only the parts that changed since the last deploy are redeployed. To redeploy everything, use **Actions → Deploy to EC2 → Run workflow**.
+
+**Repository secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Used for |
+|---|---|
+| `EC2_HOST` | Server address |
+| `EC2_SSH_KEY` | Private SSH key for the `ubuntu` user |
+| `GEMINI_API_KEY` | Written to the server's backend `.env` (AI assistant) |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `MONGODB_URI`, `JWT_SECRET`, `OPENWEATHER_API_KEY`, … | Only for the manual *Deploy Infrastructure* / *Deploy Monitoring Stack* workflows |
+
+**New server from scratch.** Run **Actions → Deploy Infrastructure**. It creates the EC2 instance with `backend/infra/cloudformation.yaml`, which installs Node, Redis, nginx and PM2 and sets up this repo. CloudWatch monitoring is deployed with **Deploy Monitoring Stack** (CDK, `backend/infra/monitoring`).
+
+**Free-hosting alternative.** Frontend on Vercel (`frontend/vercel.json`), backend on Render free tier. Render sleeps when idle, so set `JOB_SCHEDULER=qstash` and run `npm run jobs:schedule` once. On EC2, which is always on, `JOB_SCHEDULER=bullmq` is used.
 
 ---
 
