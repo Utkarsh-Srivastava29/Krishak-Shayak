@@ -9,10 +9,9 @@ import {
   removeFromCart,
   clearCart,
   placeOrder,
+  createPaymentOrder,
+  verifyPayment,
 } from "../services/marketplaceService";
-
-// Razorpay configuration - These will be loaded from environment variables
-const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "YOUR_KEY_ID";
 
 const ShoppingCart = () => {
   const navigate = useNavigate();
@@ -124,9 +123,10 @@ const ShoppingCart = () => {
     window.scrollTo(0, 0);
   };
 
-  // Load Razorpay script
+  // Load Razorpay script (once)
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
+      if (window.Razorpay) return resolve(true);
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => {
@@ -148,46 +148,50 @@ const ShoppingCart = () => {
       return false;
     }
 
-    // Create Razorpay order on backend (you'll need to implement this endpoint)
-    // For now, using frontend-only implementation
+    // 1. The server prices the cart from the database and creates the
+    //    Razorpay order. The amount is never taken from the browser.
+    let paymentOrder;
+    try {
+      paymentOrder = await createPaymentOrder(orderData);
+    } catch (error) {
+      setIsProcessing(false);
+      alert(error.message);
+      return false;
+    }
+
     const options = {
-      key: RAZORPAY_KEY_ID,
-      amount: calculateTotal() * 100, // Amount in paise
-      currency: "INR",
+      key: paymentOrder.keyId,
+      order_id: paymentOrder.razorpayOrderId,
+      amount: paymentOrder.amount, // paise, from the server
+      currency: paymentOrder.currency,
       name: "Krishak Shayak",
       description: "Agricultural Products Purchase",
-      image: "/logo.png", // Your logo URL
+      image: "/logo.png",
       handler: async function (response) {
-        // Payment successful
-        console.log("Payment successful:", response);
-
-        // Add payment details to order
-        orderData.paymentDetails = {
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razorpay_signature,
-        };
-        orderData.paymentStatus = "paid";
-
+        // 2. The server verifies the HMAC signature and marks the order paid.
         try {
-          // Send the order to the API
-          const apiResponse = await placeOrder(orderData);
+          await verifyPayment({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
           await clearCart();
 
-          // Navigate to order confirmation page
           navigate("/order-confirmation", {
             state: {
-              orderId: apiResponse.orderId || apiResponse.order?._id,
-              orderTotal: calculateTotal(),
+              orderId: paymentOrder.orderId,
+              orderTotal: paymentOrder.total,
               orderDate: new Date().toISOString(),
               paymentId: response.razorpay_payment_id,
             },
           });
         } catch (error) {
-          console.error("Failed to save order:", error);
+          console.error("Payment verification failed:", error);
           alert(
-            "Payment successful but order creation failed. Please contact support."
+            "We could not confirm your payment yet. If money was debited, your order will update automatically within a few minutes."
           );
+        } finally {
+          setIsProcessing(false);
         }
       },
       prefill: {
@@ -217,7 +221,11 @@ const ShoppingCart = () => {
     };
 
     const paymentObject = new window.Razorpay(options);
+    paymentObject.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+    });
     paymentObject.open();
+    return true;
   };
 
   const handlePlaceOrder = async () => {
