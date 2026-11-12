@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { streamChat } from "../services/chatService";
+import { streamChat, confirmAgentAction } from "../services/chatService";
+import { addToCart } from "../services/marketplaceService";
+import { getToken } from "../services/api";
 
 const HIDDEN_ON = [
   "/login",
@@ -21,6 +23,11 @@ const AssistantChatbot = () => {
   const [streamingText, setStreamingText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
+  // Agent progress for the answer being written: tool status, proposed
+  // actions (need Confirm) and official sources.
+  const [statusText, setStatusText] = useState("");
+  const [pendingActions, setPendingActions] = useState([]);
+  const [pendingCitations, setPendingCitations] = useState([]);
 
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
@@ -50,15 +57,21 @@ const AssistantChatbot = () => {
     setInput("");
     setError(null);
     setStreamingText("");
+    setStatusText("");
+    setPendingActions([]);
+    setPendingCitations([]);
     setIsStreaming(true);
 
     const controller = new AbortController();
     abortRef.current = controller;
 
     let answer = "";
+    const actions = [];
+    let citations = [];
     try {
       await streamChat({
-        messages: history,
+        // The server only needs role and text; actions/citations stay local.
+        messages: history.map(({ role, content }) => ({ role, content })),
         language: i18n.language?.startsWith("hi") ? "hi" : "en",
         page: pathname,
         signal: controller.signal,
@@ -66,8 +79,20 @@ const AssistantChatbot = () => {
           answer += chunk;
           setStreamingText(answer);
         },
+        onStatus: (text) => setStatusText(text),
+        onAction: (action) => {
+          actions.push({ ...action, state: "pending" });
+          setPendingActions([...actions]);
+        },
+        onCitations: (list) => {
+          citations = list;
+          setPendingCitations(list);
+        },
       });
-      setMessages([...history, { role: "assistant", content: answer }]);
+      setMessages([
+        ...history,
+        { role: "assistant", content: answer || "…", actions, citations },
+      ]);
     } catch (err) {
       if (err.name === "AbortError") return;
       setError(err.message);
@@ -75,9 +100,41 @@ const AssistantChatbot = () => {
     } finally {
       setIsStreaming(false);
       setStreamingText("");
+      setStatusText("");
+      setPendingActions([]);
+      setPendingCitations([]);
       abortRef.current = null;
     }
   };
+
+  const setActionState = (messageIndex, actionId, state) =>
+    setMessages((current) =>
+      current.map((message, i) =>
+        i === messageIndex
+          ? {
+              ...message,
+              actions: message.actions.map((a) => (a.id === actionId ? { ...a, state } : a)),
+            }
+          : message
+      )
+    );
+
+  // The agent only proposes write actions; nothing happens until Confirm.
+  const handleAction = async (messageIndex, action, approve) => {
+    if (!approve) return setActionState(messageIndex, action.id, "cancelled");
+    setActionState(messageIndex, action.id, "running");
+    try {
+      const result = await confirmAgentAction(action.token);
+      if (result.executeOnClient && result.type === "add_to_cart") {
+        await addToCart(result.args.productId, result.args.quantity || 1);
+      }
+      setActionState(messageIndex, action.id, "done");
+    } catch {
+      setActionState(messageIndex, action.id, "failed");
+    }
+  };
+
+  const isSignedIn = Boolean(getToken());
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -144,6 +201,15 @@ const AssistantChatbot = () => {
             <p className="text-xs text-green-100">{t("assistant.subtitle")}</p>
           </div>
           <div className="flex items-center gap-1">
+            {isSignedIn && (
+              <Link
+                to="/farm-memory"
+                onClick={closePanel}
+                className="rounded-full px-2 py-1 text-xs text-green-100 underline-offset-2 transition-colors hover:bg-green-600 hover:underline"
+              >
+                {t("assistant.memoryLink")}
+              </Link>
+            )}
             {messages.length > 0 && (
               <button
                 onClick={clearChat}
@@ -215,14 +281,27 @@ const AssistantChatbot = () => {
                   : "flex justify-start"
               }
             >
-              <div
-                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm ${
-                  message.role === "user"
-                    ? "rounded-br-sm bg-green-600 text-white"
-                    : "rounded-bl-sm bg-gray-100 text-gray-800"
-                }`}
-              >
-                {message.content}
+              <div className="max-w-[85%]">
+                <div
+                  className={`whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm ${
+                    message.role === "user"
+                      ? "rounded-br-sm bg-green-600 text-white"
+                      : "rounded-bl-sm bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {message.content}
+                </div>
+                {message.actions?.map((action) => (
+                  <ActionCard
+                    key={action.id}
+                    action={action}
+                    t={t}
+                    onDecide={(approve) => handleAction(index, action, approve)}
+                  />
+                ))}
+                {message.citations?.length > 0 && (
+                  <Sources citations={message.citations} t={t} />
+                )}
               </div>
             </div>
           ))}
@@ -231,7 +310,10 @@ const AssistantChatbot = () => {
             <div className="flex justify-start">
               <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-gray-100 px-4 py-2 text-sm text-gray-800">
                 {streamingText || (
-                  <span className="flex gap-1 py-1">
+                  <span className="flex items-center gap-1 py-1">
+                    {statusText && (
+                      <span className="mr-2 text-xs text-gray-500">{statusText}</span>
+                    )}
                     <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.3s]" />
                     <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.15s]" />
                     <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
@@ -239,6 +321,23 @@ const AssistantChatbot = () => {
                 )}
               </div>
             </div>
+          )}
+
+          {isStreaming && (pendingActions.length > 0 || pendingCitations.length > 0) && (
+            <div className="flex justify-start">
+              <div className="max-w-[85%]">
+                {pendingActions.map((action) => (
+                  <ActionCard key={action.id} action={action} t={t} disabled />
+                ))}
+                {pendingCitations.length > 0 && <Sources citations={pendingCitations} t={t} />}
+              </div>
+            </div>
+          )}
+
+          {!isSignedIn && messages.length > 0 && !isStreaming && (
+            <p className="text-center text-[11px] text-gray-400">
+              {t("assistant.signInForMemory")}
+            </p>
           )}
 
           {error && (
@@ -290,5 +389,47 @@ const AssistantChatbot = () => {
     </div>
   );
 };
+
+const ActionCard = ({ action, t, onDecide, disabled }) => (
+  <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+    <p className="font-medium">{action.summary}</p>
+    {action.state === "pending" && (
+      <div className="mt-2 flex gap-2">
+        <button
+          disabled={disabled}
+          onClick={() => onDecide(true)}
+          className="rounded-lg bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+        >
+          {t("assistant.confirm")}
+        </button>
+        <button
+          disabled={disabled}
+          onClick={() => onDecide(false)}
+          className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          {t("assistant.cancel")}
+        </button>
+      </div>
+    )}
+    {action.state === "running" && <p className="mt-1 text-xs">{t("assistant.working")}</p>}
+    {action.state === "done" && <p className="mt-1 text-xs text-green-700">✓ {t("assistant.confirmed")}</p>}
+    {action.state === "cancelled" && <p className="mt-1 text-xs text-gray-500">{t("assistant.cancelled")}</p>}
+    {action.state === "failed" && <p className="mt-1 text-xs text-red-600">{t("assistant.actionFailed")}</p>}
+  </div>
+);
+
+const Sources = ({ citations, t }) => (
+  <div className="mt-1 px-1 text-[11px] text-gray-500">
+    <span className="font-medium">{t("assistant.sources")}: </span>
+    {citations.map((c, i) => (
+      <span key={c.url}>
+        {i > 0 && " · "}
+        <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-green-700 underline">
+          {c.title}
+        </a>
+      </span>
+    ))}
+  </div>
+);
 
 export default AssistantChatbot;
