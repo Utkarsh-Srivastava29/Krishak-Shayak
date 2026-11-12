@@ -1,12 +1,9 @@
 import axios from "axios";
 import { API_URL } from "./api";
 
-// Replace with your actual API key from OpenWeatherMap
-const API_KEY =
-  import.meta.env.VITE_WEATHER_API_KEY || "97a99a6978e3f046029de9c4a8a54795";
-const BASE_URL = `${
-  import.meta.env.VITE_WEATHER_BASE_URL || "https://api.openweathermap.org"
-}/data/2.5`;
+// OpenWeatherMap is called through the backend (/api/weather/owm/*), which
+// holds the API key; responses keep OpenWeatherMap's own JSON shape.
+const OWM = `${API_URL}/weather/owm`;
 
 // Function to fetch current weather and forecast data
 export const getWeatherData = async (location) => {
@@ -15,9 +12,7 @@ export const getWeatherData = async (location) => {
   try {
     // Get coordinates from location name
     const geoResponse = await axios.get(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
-        location
-      )}&limit=1&appid=${API_KEY}`
+      `${OWM}/geo?q=${encodeURIComponent(location)}&limit=1`
     );
 
     if (!geoResponse.data || geoResponse.data.length === 0) {
@@ -28,12 +23,12 @@ export const getWeatherData = async (location) => {
 
     // Get current weather
     const currentResponse = await axios.get(
-      `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      `${OWM}/current?lat=${lat}&lon=${lon}`
     );
 
     // Get 5-day forecast
     const forecastResponse = await axios.get(
-      `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      `${OWM}/forecast?lat=${lat}&lon=${lon}`
     );
 
     // Format the response data
@@ -71,9 +66,7 @@ export const getHourlyForecast = async (location) => {
   try {
     // Get coordinates from location name
     const geoResponse = await axios.get(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
-        location
-      )}&limit=1&appid=${API_KEY}`
+      `${OWM}/geo?q=${encodeURIComponent(location)}&limit=1`
     );
 
     if (!geoResponse.data || geoResponse.data.length === 0) {
@@ -84,7 +77,7 @@ export const getHourlyForecast = async (location) => {
 
     // Get hourly forecast
     const response = await axios.get(
-      `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      `${OWM}/forecast?lat=${lat}&lon=${lon}`
     );
 
     // Process 3-hourly data (OpenWeatherMap free tier provides 3-hour intervals)
@@ -127,9 +120,7 @@ export const getExtendedForecast = async (location) => {
   try {
     // Get coordinates from location name
     const geoResponse = await axios.get(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
-        location
-      )}&limit=1&appid=${API_KEY}`
+      `${OWM}/geo?q=${encodeURIComponent(location)}&limit=1`
     );
 
     if (!geoResponse.data || geoResponse.data.length === 0) {
@@ -141,7 +132,7 @@ export const getExtendedForecast = async (location) => {
     // For extended forecast, we'll use the One Call API which provides 7-day forecast
     // Note: This requires a paid subscription, so we'll mock days 6+ for the free tier
     const response = await axios.get(
-      `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      `${OWM}/forecast?lat=${lat}&lon=${lon}`
     );
 
     // Process the 5-day forecast from the API
@@ -378,9 +369,7 @@ export const getSuggestedCities = async (input) => {
 
   try {
     const response = await axios.get(
-      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
-        input
-      )}&limit=5&appid=${API_KEY}`
+      `${OWM}/geo?q=${encodeURIComponent(input)}&limit=5`
     );
 
     return response.data.map((city) => {
@@ -395,75 +384,6 @@ export const getSuggestedCities = async (input) => {
 
 // Calculate soil moisture index based on weather data
 
-// Implementation for getting more detailed hourly forecast
-// This is an alternative implementation that you could use
-export const getDetailedHourlyForecast = async (location) => {
-  try {
-    // Make sure to request hourly data with 1-hour intervals
-    // This may vary depending on which weather API you're using
-    const response = await fetch(
-      `YOUR_API_ENDPOINT?location=${encodeURIComponent(
-        location
-      )}&hourly=true&interval=1`
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch hourly forecast");
-    }
-
-    const data = await response.json();
-
-    // Process the API response into hourly intervals
-    // If your API already returns hourly data, you might not need this processing
-    const processedData = processHourlyData(data);
-
-    return processedData;
-  } catch (error) {
-    console.error("Error fetching detailed hourly forecast:", error);
-    throw error;
-  }
-};
-
-// Helper function to process API data into consistent hourly format
-const processHourlyData = (apiData) => {
-  // This will depend on your API's response format
-  // The goal is to ensure you have entries for each hour, not every 3 hours
-
-  // Example of what this might look like:
-  const hourlyData = [];
-
-  // Assuming apiData has some sort of hourly array
-  for (let i = 0; i < 24; i++) {
-    const hour = {
-      time: formatHourTime(
-        apiData.hourly[i].time || new Date().setHours(new Date().getHours() + i)
-      ),
-      timestamp:
-        apiData.hourly[i].timestamp ||
-        Math.floor(new Date().setHours(new Date().getHours() + i) / 1000),
-      icon: getWeatherIcon(apiData.hourly[i].condition || "clear"),
-      temp: apiData.hourly[i].temp || "N/A",
-      condition: apiData.hourly[i].condition || "No data",
-      precipProbability: apiData.hourly[i].precipProbability || 0,
-      windSpeed: apiData.hourly[i].windSpeed || "N/A",
-      humidity: apiData.hourly[i].humidity || "N/A",
-      feelsLike: apiData.hourly[i].feelsLike || "N/A",
-    };
-
-    hourlyData.push(hour);
-  }
-
-  return hourlyData;
-};
-
-// Helper to format hour display
-const formatHourTime = (timestamp) => {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-};
-
-// Real root-zone soil moisture (Open-Meteo) plus weather-specific advice (Gemini),
-// both served by our backend so no keys are exposed to the browser.
 export const getWeatherInsights = async (location, lang = "en") => {
   const response = await axios.get(`${API_URL}/weather/insights`, {
     params: { location, lang },
