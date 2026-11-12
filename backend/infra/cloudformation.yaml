@@ -51,6 +51,29 @@ Parameters:
     Default: ''
     Description: 'Google Gemini API key for the AI assistant (free at aistudio.google.com/apikey)'
 
+  NewsDataAPIKey:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: 'NewsData.io API key for agriculture news (server-side only)'
+
+  RazorpayKeyId:
+    Type: String
+    Default: ''
+    Description: 'Razorpay key id (public, returned to Checkout by the backend)'
+
+  RazorpayKeySecret:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: 'Razorpay key secret (server only)'
+
+  RazorpayWebhookSecret:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: 'Razorpay webhook secret for /api/payments/webhook'
+
   SchemesSheetURL:
     Type: String
     Description: 'Google Sheets CSV URL for schemes'
@@ -205,6 +228,10 @@ Resources:
           GEMINI_API_KEY=${GeminiAPIKey}
           JOB_SCHEDULER=bullmq
           VECTOR_SEARCH_MODE=local
+          NEWSDATA_API_KEY=${NewsDataAPIKey}
+          RAZORPAY_KEY_ID=${RazorpayKeyId}
+          RAZORPAY_KEY_SECRET=${RazorpayKeySecret}
+          RAZORPAY_WEBHOOK_SECRET=${RazorpayWebhookSecret}
           ENVEOF
 
           sudo -u ubuntu npm install
@@ -225,10 +252,6 @@ Resources:
 
           sudo -u ubuntu cat > .env << FENVEOF
           VITE_API_URL=/api
-          VITE_RAZORPAY_KEY_ID=rzp_test_placeholder
-          VITE_WEATHER_API_KEY=${OpenWeatherAPIKey}
-          VITE_WEATHER_BASE_URL=https://api.openweathermap.org
-          VITE_NEWSDATA_API_KEY=pub_2f4c600e7310491fb5df044fc12ba621
           FENVEOF
 
           sudo -u ubuntu npm install

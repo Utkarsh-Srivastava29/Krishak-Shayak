@@ -128,7 +128,7 @@ npm run eval -- --resume eval/results/eval-<time>.json
 
 ## Setup checklist
 
-**On the EC2 deployment** this is automatic. Add a `GEMINI_API_KEY` repository secret, and the deploy workflow writes it to the server's `.env`, sets `JOB_SCHEDULER=bullmq` and runs `rag:ingest`. For a manual or other setup:
+**On the EC2 deployment** this is automatic. Add a `GEMINI_API_KEY` repository secret (plus `NEWSDATA_API_KEY` and the `RAZORPAY_*` secrets for news and payments), and the deploy workflow writes them to the server's `.env`, sets `JOB_SCHEDULER=bullmq` and runs `rag:ingest`. For a manual or other setup:
 
 
 1. `npm install` in `backend/`. This adds `bullmq`.

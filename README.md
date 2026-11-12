@@ -29,8 +29,10 @@
 | **AI farm assistant** | Ask in Hindi or English. Answers to questions like *"should I sell my wheat this week?"* use live prices, the forecast and verified scheme data. |
 | **Weather** | Current conditions, hourly and 5-day forecast, soil moisture, and AI tips for the day's field work. |
 | **Mandi prices** | Daily commodity prices from the government Agmarknet feed (data.gov.in), filtered by state, district, market and crop. |
-| **Government schemes** | Searchable catalogue of central and state schemes, with eligibility, benefits and official links. |
-| **Marketplace** | Buy seeds, fertiliser, tools and equipment; sellers manage shops, products and orders. Includes a secure payment gateway. |
+| **Crop recommendations** | Crops to sow now or next month, ranked from the crop calendar, the live forecast, soil moisture, the farmer's irrigation and soil, with today's mandi price. Also available to the assistant. |
+| **Agriculture news** | Latest farming news in English or Hindi, fetched on the server; English headlines are translated when Hindi news is scarce. |
+| **Government schemes** | Searchable catalogue of central and state schemes, with eligibility, benefits and official links, in English or Hindi. |
+| **Marketplace** | Buy seeds, fertiliser, tools and equipment; sellers manage shops, products and orders. Online payments use server-created Razorpay orders with signature verification and a webhook. |
 | **Farm memory** | *My Farm Memory* page showing what the assistant remembers (crops, district, farm diary). Everything can be edited or deleted. |
 | **Proactive alerts** | Daily alerts, e.g. rain before a planned spray, frost risk, or big price moves for your crops. |
 | **Accounts & security** | JWT and Google OAuth login, email OTP two-factor authentication, password reset, and Redis token-bucket rate limiting. |
@@ -156,7 +158,8 @@ npm run dev                 # http://localhost:5173
 
 ```bash
 cd backend
-npm run test:ai             # 36 unit tests for the agent, RAG, memory, jobs and alerts
+npm run test:ai             # 57 unit tests: agent, RAG, memory, jobs, alerts, crops, news, translation, weather proxy
+npm run test:payment        # 12 payment tests
 ```
 
 Open the app, click **Ask Krishak Sahayak**, and try *"Will it rain in Etawah this week?"*.
@@ -174,7 +177,7 @@ The full list, with comments, is in [`backend/.env.example`](backend/.env.exampl
 | `MONGODB_URI` | MongoDB connection string |
 | `JWT_SECRET` | Signs login tokens (and agent action tokens) |
 | `GEMINI_API_KEY` | AI assistant, embeddings, memory, evaluation |
-| `OPENWEATHER_API_KEY` | Weather data |
+| `OPENWEATHER_API_KEY` | Weather data (server-side; the browser goes through `/api/weather/owm/*`) |
 | `FRONTEND_URL` | Allowed CORS origin |
 
 **Backend: optional**
@@ -189,6 +192,8 @@ The full list, with comments, is in [`backend/.env.example`](backend/.env.exampl
 | `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY`, `PUBLIC_API_URL` | Scheduled jobs through Upstash QStash |
 | `ALERT_EMAILS_ENABLED` | Also email daily alerts (uses the `EMAIL_*` SMTP settings) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `EMAIL_*` | Google login and email OTP |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Online payments (cash on delivery works without them) |
+| `NEWSDATA_API_KEY` | Agriculture news on the home page |
 
 ---
 
@@ -300,6 +305,7 @@ Krishak-Shayak/
 | `EC2_HOST` | Server address |
 | `EC2_SSH_KEY` | Private SSH key for the `ubuntu` user |
 | `GEMINI_API_KEY` | Written to the server's backend `.env` (AI assistant) |
+| `NEWSDATA_API_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Written to the server's backend `.env` (news, payments) |
 | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `MONGODB_URI`, `JWT_SECRET`, `OPENWEATHER_API_KEY`, … | Only for the manual *Deploy Infrastructure* / *Deploy Monitoring Stack* workflows |
 
 **New server from scratch.** Run **Actions → Deploy Infrastructure**. It creates the EC2 instance with `backend/infra/cloudformation.yaml`, which installs Node, Redis, nginx and PM2 and sets up this repo. CloudWatch monitoring is deployed with **Deploy Monitoring Stack** (CDK, `backend/infra/monitoring`).

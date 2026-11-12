@@ -8,6 +8,8 @@ name: Deploy to EC2
 #   EC2_HOST         server address (e.g. krishakshayak.duckdns.org)
 #   EC2_SSH_KEY      private key for the "ubuntu" user
 #   GEMINI_API_KEY   optional: written to the server's backend .env
+#   NEWSDATA_API_KEY, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET,
+#   RAZORPAY_WEBHOOK_SECRET   optional: also written to the backend .env
 
 on:
   push:
@@ -36,13 +38,17 @@ jobs:
         uses: appleboy/ssh-action@v1
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
           FORCE_DEPLOY: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
           REPO_URL: https://github.com/${{ github.repository }}.git
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GEMINI_API_KEY,FORCE_DEPLOY,REPO_URL
+          envs: GEMINI_API_KEY,NEWSDATA_API_KEY,RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET,RAZORPAY_WEBHOOK_SECRET,FORCE_DEPLOY,REPO_URL
           command_timeout: 30m
           script: |
             set -euo pipefail
@@ -104,6 +110,10 @@ jobs:
 
               ENV_FILE="$BACKEND_DIR/.env"
               if [ -n "${GEMINI_API_KEY:-}" ]; then set_env "$ENV_FILE" GEMINI_API_KEY "$GEMINI_API_KEY"; fi
+              if [ -n "${NEWSDATA_API_KEY:-}" ]; then set_env "$ENV_FILE" NEWSDATA_API_KEY "$NEWSDATA_API_KEY"; fi
+              if [ -n "${RAZORPAY_KEY_ID:-}" ]; then set_env "$ENV_FILE" RAZORPAY_KEY_ID "$RAZORPAY_KEY_ID"; fi
+              if [ -n "${RAZORPAY_KEY_SECRET:-}" ]; then set_env "$ENV_FILE" RAZORPAY_KEY_SECRET "$RAZORPAY_KEY_SECRET"; fi
+              if [ -n "${RAZORPAY_WEBHOOK_SECRET:-}" ]; then set_env "$ENV_FILE" RAZORPAY_WEBHOOK_SECRET "$RAZORPAY_WEBHOOK_SECRET"; fi
               # EC2 is always on, so BullMQ schedules the daily jobs itself.
               add_env_if_missing "$ENV_FILE" JOB_SCHEDULER bullmq
               add_env_if_missing "$ENV_FILE" VECTOR_SEARCH_MODE local
