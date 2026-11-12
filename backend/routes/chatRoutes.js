@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { createRateLimiter } = require("../middleware/rateLimiter");
-const { chat } = require("../controllers/chatController");
+const { optionalAuth } = require("../middleware/optionalAuth");
+const { protect } = require("../middleware/authMiddleware");
+const { chat, confirmAction } = require("../controllers/chatController");
 
 // 10 messages burst, refilling at 1 every 10 seconds
 const chatRateLimiter = createRateLimiter({
@@ -10,7 +12,10 @@ const chatRateLimiter = createRateLimiter({
   identifierExtractor: (req) => ({ ip: req.ip }),
 });
 
-// POST /api/chat
-router.post("/", chatRateLimiter, chat);
+// POST /api/chat — works for guests; signed-in farmers get memory
+router.post("/", chatRateLimiter, optionalAuth, chat);
+
+// POST /api/chat/actions/confirm — run an action the farmer confirmed
+router.post("/actions/confirm", protect, confirmAction);
 
 module.exports = router;
